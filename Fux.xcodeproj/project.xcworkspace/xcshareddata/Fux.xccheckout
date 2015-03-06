@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>7ADD0876-E94D-4D70-868A-361242843D34</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Fux</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>33D6E60B96F1FFB1D6759A9AF10493A902BFCDE5</key>
+		<string>https://github.com/joelchapman/fux.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Fux.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>33D6E60B96F1FFB1D6759A9AF10493A902BFCDE5</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/joelchapman/fux.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>33D6E60B96F1FFB1D6759A9AF10493A902BFCDE5</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>33D6E60B96F1FFB1D6759A9AF10493A902BFCDE5</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Fux</string>
+		</dict>
+	</array>
+</dict>
+</plist>

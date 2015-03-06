@@ -7,12 +7,14 @@
 //
 
 #import "GLoilerViewController.h"
-
 #import "renderer.h"
 #import "mo-glut.h"
 #import <iostream>
 
-@interface GLoilerViewController ()
+
+@interface GLoilerViewController () {
+
+}
 
 @property (strong, nonatomic) EAGLContext *context;
 @property (strong, nonatomic) GLKBaseEffect *effect;
@@ -87,6 +89,24 @@
     [EAGLContext setCurrentContext:self.context];
     self.effect = nil;
 }
+
+-(IBAction) record:(id)sender
+{
+    [flarg record:sender];
+}
+
+-(IBAction) play:(id)sender
+{
+    [flarg play:sender];
+}
+
+-(IBAction) upload:(id)sender
+{
+    [flarg upload:sender];
+}
+
+
+
 
 #pragma mark - GLKView and GLKViewController delegate methods
 

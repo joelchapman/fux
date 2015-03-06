@@ -12,4 +12,6 @@
 
 @interface GLoilerViewController : GLKViewController
 
+- (IBAction)uploadSound:(id)sender;
+
 @end

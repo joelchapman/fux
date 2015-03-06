@@ -9,58 +9,154 @@
 #import "renderer.h"
 #import "mo-audio.h"
 #import "mo-gfx.h"
+#import "mo-fun.h"
 #import "mo-touch.h"
+#import "JCAudioFile.h"
+#import "GLEntity.h"
+#import "JCCoordinates.h"
+#import "JCAudioFile.h"
 
+#import <iostream>
 
-#define SRATE 24000
+using namespace std;
+
+// Audio Defines
+#define SRATE 44100
 #define FRAMESIZE 512
+#define DELAYTIME 10
 #define NUM_CHANNELS 2
 
-// global variables
-GLfloat g_waveformWidth = 300;
-GLfloat g_gfxWidth = 320;
-GLfloat g_gfxHeight = 568;
+#define NUM_PROGRESS 1
+#define NUM_BUTTONS 1
+#define NUM_ENCOURAGEMENTS 1
+#define NUM_ENCOURAGEMENT_PNGS 10
+#define Z_CLOSE 4.0
 
-// buffer
-SAMPLE g_vertices[FRAMESIZE*2];
-UInt32 g_numFrames;
+// Screen Info
+static CGRect screenRect = [[UIScreen mainScreen] bounds];
+static CGFloat screenWidth = screenRect.size.width;
+static CGFloat screenHeight = screenRect.size.height;
 
+static GLfloat g_waveformWidth = 300;
+static GLfloat g_gfxWidth = screenWidth;
+static GLfloat g_gfxHeight = screenHeight;
+
+// Audio Buffers
+SAMPLE g_vertices[FRAMESIZE*2]; //used for drawing waveforms
+static UInt32 g_numFrames;
+int delaySize = JCAudioFile::bufferSize();
+static Float32 delayedBuffer[SRATE*DELAYTIME]; //temp buffer to record audio
+JCAudioFile userRecording;
+
+// Texture globals
+static GLuint g_texture[1];
+static int g_rand_texture;
+
+// Program globals
+static bool g_listen = false; //when true, records audio
+static bool g_next_encouragement = false;
+static bool g_record_track = false;
+static bool g_play = false;
+
+// Class instantiations
+GLEntity g_progress;
+GLEntity g_button;
+GLEntity g_encouragements[NUM_ENCOURAGEMENTS];
+JCCoordinates g_coords;
+
+
+//-----------------------------------------------------------------------------
+// OBJECTIVE C STUFF
+//-----------------------------------------------------------------------------
+@implementation flarg : NSObject
+
++(void) record:(id)sender
+{
+    g_listen = true;
+}
+
++(void) play:(id)sender
+{
+    g_play = true;
+}
+
++(void) upload:(id)sender
+{
+    g_play = true;
+}
+
+@end
 
 
 
 //-----------------------------------------------------------------------------
 // name: audio_callback()
-// desc: audio callback, yeah
+// desc: audio callback
 //-----------------------------------------------------------------------------
+static int j = 0;
+static int k = j + 1;
 void audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
 {
     // our x
     SAMPLE x = 0;
     // increment
     SAMPLE inc = g_waveformWidth / numFrames;
-
-    // zero!!!
     memset( g_vertices, 0, sizeof(SAMPLE)*FRAMESIZE*2 );
     
     for( int i = 0; i < numFrames; i++ )
     {
+        
         // set to current x value
         g_vertices[2*i] = x;
         // increment x
         x += inc;
         // set the y coordinate (with scaling)
         g_vertices[2*i+1] = buffer[2*i] * 2 * g_gfxHeight;
-        // zero
-        buffer[2*i] = buffer[2*i+1] = 0;
+        
+        
+        if (g_listen)
+        {
+        //    if (g_record_track) {
+                delayedBuffer[j] = buffer[i*2+1];
+                
+                if(j<(SRATE*DELAYTIME-1))
+                {
+                    j++;
+                    if (j % SRATE == 0) k++;
+                }
+                else
+                {
+               //     g_record_track = false;
+                 //   g_listen = false;
+                    userRecording.setRecording(delayedBuffer, 1);
+                    
+                    j = 0;
+                    k = j + 1;
+                }
+            //}
+            
+   //     } else if (g_play) {
+            
+        } else delayedBuffer[i] = 0;
+   //     if(g_play)
+   //     {
+   //         buffer[i*2] = buffer[i*2+1] = delayedBuffer[j];
+    //    }
+        buffer[i*2] = buffer[i*2+1] = delayedBuffer[j];
+        
+        
     }
     
     // save the num frames
     g_numFrames = numFrames;
-    
-    // NSLog( @"." );
 }
 
 
+bool isTouchingButton(CGPoint pt)
+{
+    
+    return true;
+}
 
 
 //-----------------------------------------------------------------------------
@@ -92,6 +188,10 @@ void touch_callback( NSSet * touches, UIView * view,
                 // begin
             case UITouchPhaseBegan:
             {
+//                if (pt.x == g_button.loc.z + 0.5) {
+//                    g_listen = true;
+//                }
+                
                 NSLog( @"touch began... %f %f", pt.x, pt.y );
                 break;
             }
@@ -108,6 +208,7 @@ void touch_callback( NSSet * touches, UIView * view,
                 // ended or cancelled
             case UITouchPhaseEnded:
             {
+           //     g_listen = false;
                 NSLog( @"touch ended... %f %f", pt.x, pt.y );
                 break;
             }
@@ -123,14 +224,364 @@ void touch_callback( NSSet * touches, UIView * view,
     }
 }
 
-// initialize the engine (audio, grx, interaction)
-void GLoilerInit()
+
+//-----------------------------------------------------------------------------
+// name: loadTextures()
+// desc: loads the right texture based on the ol' switcheroo
+//-----------------------------------------------------------------------------
+void loadTextures()
 {
-    NSLog( @"init..." );
+    int switcheroo;
+    if (k < 10) switcheroo = j/SRATE + 1;
+    else if (k == 10) switcheroo = k;
+
+    // if recording...
+    if (g_listen) {
+        switch (switcheroo) {
+            case 0:
+                MoGfx::loadTexture(@"progress_10", @"png");
+                break;
+                
+            case 1:
+                MoGfx::loadTexture(@"progress_9", @"png");
+                break;
+                
+            case 2:
+                MoGfx::loadTexture(@"progress_8", @"png");
+                break;
+                
+            case 3:
+                MoGfx::loadTexture(@"progress_7", @"png");
+                break;
+                
+            case 4:
+                MoGfx::loadTexture(@"progress_6", @"png");
+                break;
+                
+            case 5:
+                MoGfx::loadTexture(@"progress_5", @"png");
+                break;
+                
+            case 6:
+                MoGfx::loadTexture(@"progress_4", @"png");
+                break;
+                
+            case 7:
+                MoGfx::loadTexture(@"progress_3", @"png");
+                break;
+                
+            case 8:
+                MoGfx::loadTexture(@"progress_2", @"png");
+                break;
+                
+            case 9:
+                MoGfx::loadTexture(@"progress_1", @"png");
+                break;
+                
+            case 10:
+                MoGfx::loadTexture(@"progress_0", @"png");
+                break;
+                
+            default:
+                MoGfx::loadTexture(@"progress_0", @"png");
+                break;
+        }
+    } else MoGfx::loadTexture(@"progress_10", @"png");
+
+
+}
+
+
+void loadEncouragements()
+{
+    switch (g_rand_texture) {
+        case 1:
+            MoGfx::loadTexture(@"bangin", @"png");
+            break;
+            
+        case 2:
+            MoGfx::loadTexture(@"hawt", @"png");
+            break;
+            
+        case 3:
+            MoGfx::loadTexture(@"sexier", @"png");
+            break;
+            
+        case 4:
+            MoGfx::loadTexture(@"sexy", @"png");
+            break;
+            
+        case 5:
+            MoGfx::loadTexture(@"smagin", @"png");
+            break;
+            
+        case 6:
+            MoGfx::loadTexture(@"someone", @"png");
+            break;
+            
+        case 7:
+            MoGfx::loadTexture(@"style", @"png");
+            break;
+            
+        case 8:
+            MoGfx::loadTexture(@"thang", @"png");
+            break;
+
+        case 9:
+            MoGfx::loadTexture(@"the_one", @"png");
+            break;
+            
+        case 10:
+            MoGfx::loadTexture(@"you_got_this", @"png");
+            break;
+            
+        default:
+            MoGfx::loadTexture(@"sexy", @"png");
+            break;
+    }
+}
+
+
+void draw(GLEntity entity, int num)
+{
+    // for each entity
+    for( int i = 0; i < num; i++ )
+    {
+        glPushMatrix();
+        
+        // translate
+        glTranslatef( entity.loc.x, entity.loc.y, entity.loc.z );
+        glScalef( entity.sca.x, entity.sca.y, entity.sca.z );
+        
+        //color
+        GLfloat val = 1;
+        float v = val;
+        glColor4f(entity.col.x*v, entity.col.y*v, entity.col.z*v, val);
+        
+        // vertex
+        glVertexPointer( 2, GL_FLOAT, 0, g_coords.squareVertices );
+        glEnableClientState(GL_VERTEX_ARRAY );
+        
+        // normal
+        glNormalPointer( GL_FLOAT, 0, g_coords.normals );
+        glEnableClientState( GL_NORMAL_ARRAY );
+        
+        // texture coordinate
+        glTexCoordPointer( 2, GL_FLOAT, 0, g_coords.texCoords );
+        glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+        
+        // triangle strip
+        glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+        
+        glPopMatrix();
+    }
+}
+
+//-----------------------------------------------------------------------------
+// name: drawEncouragements()
+// desc:
+//-----------------------------------------------------------------------------
+void drawEncouragements()
+{
+    loadEncouragements();
     
+    // for each entity
+    for( int i = 0; i < NUM_ENCOURAGEMENTS; i++ )
+    {
+        glPushMatrix();
+        
+        if (g_next_encouragement == true) {
+            g_rand_texture = MoFun::rand2f(1, NUM_ENCOURAGEMENT_PNGS);
+            g_encouragements[i].setRandomCoords();
+        }
+        
+        g_next_encouragement = false;
+        
+        // translate
+        glTranslatef( g_encouragements[i].loc.x, g_encouragements[i].loc.y, g_encouragements[i].loc.z );
+        glScalef( g_encouragements[i].sca.x, g_encouragements[i].sca.y, g_encouragements[i].sca.z );
+        
+        //color
+        GLfloat val = 1 - fabs(g_encouragements[i].loc.z)/Z_CLOSE;
+        float v = val;
+        glColor4f(g_encouragements[i].col.x*v, g_encouragements[i].col.y*v, g_encouragements[i].col.z*v, val);
+        
+        g_encouragements[i].loc.z += 0.2;
+        g_encouragements[i].sca.x += 0.2;
+        g_encouragements[i].sca.y += 0.3;
+        
+        if (g_encouragements[i].loc.z > Z_CLOSE) {
+            g_encouragements[i].setRandomCoords();
+            g_next_encouragement = true;
+        }
+        
+        // vertex
+        glVertexPointer( 2, GL_FLOAT, 0, g_coords.squareVertices );
+        glEnableClientState(GL_VERTEX_ARRAY );
+        
+        // normal
+        glNormalPointer( GL_FLOAT, 0, g_coords.normals );
+        glEnableClientState( GL_NORMAL_ARRAY );
+        
+        // texture coordinate
+        glTexCoordPointer( 2, GL_FLOAT, 0, g_coords.texCoords );
+        glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+        
+        // triangle strip
+        glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+        
+        glPopMatrix();
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+// name: drawButton()
+// desc:
+//-----------------------------------------------------------------------------
+void drawButton()
+{
+    MoGfx::loadTexture(@"record_button", @"png");
+  //  draw(g_button, NUM_BUTTONS);
+}
+
+//-----------------------------------------------------------------------------
+// name: drawProgressBar()
+// desc: draws triangle strips of texture to screen
+//-----------------------------------------------------------------------------
+void drawProgressBar()
+{
+    // clear
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    loadTextures();
+    draw(g_progress, NUM_PROGRESS);
+}
+
+
+void drawRecordScreen()
+{
+    drawProgressBar();
+    drawButton();
+    if (g_listen) {
+        drawEncouragements();
+    }
+}
+
+
+void initializeProgress()
+{
+    g_progress.setProgressCoords();
+}
+
+
+void initializeButton()
+{
+    g_button.setButtonCoords();
+}
+
+
+void initializeEncouragements()
+{
+    for (int i = 0; i < NUM_ENCOURAGEMENTS; i++) {
+        g_encouragements[i].setRandomCoords();
+    }
+}
+
+
+void initializeTextures()
+{
+    initializeProgress();
+    initializeButton();
+    initializeEncouragements();
+}
+
+
+//-----------------------------------------------------------------------------
+// name: drawWaveforms()
+// desc: draws a time domain-amplitude graph in real time
+//-----------------------------------------------------------------------------
+void drawWaveforms()
+{
+    // push
+    glPushMatrix();
+    
+    // center it
+    // glTranslatef( -g_waveformWidth / 2, 0, 4 );
+    glTranslatef( 0, 0, 4 );
+    //   glScalef(0.2, 0.2, 0.2);
+    
+    // set the vertex array pointer
+    glVertexPointer( 2, GL_FLOAT, 0, g_vertices );
+    glEnableClientState( GL_VERTEX_ARRAY );
+    
+    // color
+    glColor4f( 1, 1, 0, 1 );
+    // draw the thing
+    glDrawArrays( GL_LINE_STRIP, 0, g_numFrames/2 );
+    
+    // color
+    glColor4f( 0, 1, 0, 1 );
+    // draw the thing
+    glDrawArrays( GL_LINE_STRIP, g_numFrames/2-1, g_numFrames/2 );
+    
+    // pop
+    glPopMatrix();
+}
+
+void GLoilerInitVisual()
+{
+    // projection
+    glMatrixMode( GL_PROJECTION );
+    
+    // reset
+    glLoadIdentity();
+    
+    // orthographic
+    glOrthof( -g_gfxWidth/2, g_gfxWidth/2, -g_gfxHeight/2, g_gfxHeight/2, -1.0f, 1.0f );
+    
+    // perspective projection
+    MoGfx::perspective( 70, screenWidth/screenHeight, .01, 100 );
+    
+    // modelview
+    glMatrixMode( GL_MODELVIEW );
+    
+    // look
+    MoGfx::lookAt( 0, 0, 6, 0, 0, 0, 0, 1, 0 );
+    
+    // enable texture mapping
+    glEnable( GL_TEXTURE_2D );
+    // enable blending
+    glEnable( GL_BLEND );
+    // blend function
+    glBlendFunc( GL_ONE, GL_ONE );
+    //   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    
+    // generate texture name
+    glGenTextures( 1, &g_texture[0] );
+    // bind the texture
+    glBindTexture( GL_TEXTURE_2D, g_texture[0] );
+    // setting parameters
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    
+    
+    //init GLEntities
+    initializeTextures();
+}
+
+
+void GLoilerInitTouch()
+{
     // set touch callback
     MoTouch::addCallback( touch_callback, NULL );
+}
 
+void GLoilerInitAudio()
+{
+    memset( delayedBuffer, 0, sizeof SRATE*DELAYTIME );
+    
     // init
     bool result = MoAudio::init( SRATE, FRAMESIZE, NUM_CHANNELS );
     if( !result )
@@ -139,6 +590,7 @@ void GLoilerInit()
         int * p = 0;
         *p = 0;
     }
+    
     // start
     result = MoAudio::start( audio_callback, NULL );
     if( !result )
@@ -149,55 +601,37 @@ void GLoilerInit()
     }
 }
 
-// set graphics dimensions
+
+//-----------------------------------------------------------------------------
+// name: GLoilerInit()
+// desc: initialize the engine (audio, gfx, interaction)
+//-----------------------------------------------------------------------------
+void GLoilerInit()
+{
+    NSLog( @"init..." );
+    
+    GLoilerInitVisual();
+    GLoilerInitTouch();
+    GLoilerInitAudio();
+}
+
+
+//-----------------------------------------------------------------------------
+// name: GLoilerSetDims( float width, float height )
+// desc: set graphics dimensions
+//-----------------------------------------------------------------------------
 void GLoilerSetDims( float width, float height )
 {
     NSLog( @"set dims: %f %f", width, height );
 }
 
-// draw next frame of graphics
+
+//-----------------------------------------------------------------------------
+// name: GLoilerRender()
+// desc: draw next frame of graphics
+//-----------------------------------------------------------------------------
 void GLoilerRender()
 {
-    // NSLog( @"render..." );
-    
-    // projection
-    glMatrixMode( GL_PROJECTION );
-    // reset
-    glLoadIdentity();
-    // alternate
-    // GLfloat ratio = g_gfxHeight / g_gfxWidth;
-    // glOrthof( -1, 1, -ratio, ratio, -1, 1 );
-    // orthographic
-    glOrthof( -g_gfxWidth/2, g_gfxWidth/2, -g_gfxHeight/2, g_gfxHeight/2, -1.0f, 1.0f );
-    // modelview
-    glMatrixMode( GL_MODELVIEW );
-    // reset
-    // glLoadIdentity();
-    
-    glClearColor( 0, 0, 0, 1 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    // push
-    glPushMatrix();
-
-    // center it
-    glTranslatef( -g_waveformWidth / 2, 0, 0 );
-    
-    // set the vertex array pointer
-    glVertexPointer( 2, GL_FLOAT, 0, g_vertices );
-    glEnableClientState( GL_VERTEX_ARRAY );
-    
-    // color
-    glColor4f( 1, 1, 0, 1 );
-    // draw the thing
-    glDrawArrays( GL_LINE_STRIP, 0, g_numFrames/2 );
-
-    // color
-    glColor4f( 0, 1, 0, 1 );
-    // draw the thing
-    glDrawArrays( GL_LINE_STRIP, g_numFrames/2-1, g_numFrames/2 );
-
-    // pop
-    glPopMatrix();
+//    drawWaveforms();
+    drawRecordScreen();
 }
-
