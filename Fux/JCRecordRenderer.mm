@@ -1,12 +1,13 @@
 //
-//  renderer.cpp
-//  GLoiler
+//  JCRecordRenderer.mm
+//  Fux
 //
-//  Created by Ge Wang on 1/21/14.
-//  Copyright (c) 2014 Ge Wang. All rights reserved.
+//  Created by Joel Chapman on 2/26/15.
+//  Copyright (c) 2015 Joel Chapman. All rights reserved.
+//  Using boiler-plate code from "Gloiler" (including MOMU) by Ge Wang.
 //
 
-#import "renderer.h"
+#import "JCRecordRenderer.h"
 #import "mo-audio.h"
 #import "mo-gfx.h"
 #import "mo-fun.h"
@@ -22,7 +23,7 @@ using namespace std;
 
 // Audio Defines
 #define SRATE 44100
-#define FRAMESIZE 512
+#define FRAMESIZE 1024
 #define DELAYTIME 10
 #define NUM_CHANNELS 2
 
@@ -41,12 +42,12 @@ static GLfloat g_waveformWidth = 300;
 static GLfloat g_gfxWidth = screenWidth;
 static GLfloat g_gfxHeight = screenHeight;
 
-// Audio Buffers
+// Audio Variables
 SAMPLE g_vertices[FRAMESIZE*2]; //used for drawing waveforms
 static UInt32 g_numFrames;
 int delaySize = JCAudioFile::bufferSize();
 static Float32 delayedBuffer[SRATE*DELAYTIME]; //temp buffer to record audio
-JCAudioFile userRecording;
+const char * fpath = "/Users/Joel/Documents/Academic/College/Coterm\ Year/256b/Fux/Fux/Supporting\ Files/Recordings/audio_profile.m4a";
 
 // Texture globals
 static GLuint g_texture[1];
@@ -55,18 +56,19 @@ static int g_rand_texture;
 // Program globals
 static bool g_listen = false; //when true, records audio
 static bool g_next_encouragement = false;
-static bool g_record_track = false;
-static bool g_play = false;
+static bool g_play = false; // when true, plays audio
 
 // Class instantiations
 GLEntity g_progress;
 GLEntity g_button;
 GLEntity g_encouragements[NUM_ENCOURAGEMENTS];
 JCCoordinates g_coords;
-
+JCAudioFile userRecording;
 
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // OBJECTIVE C STUFF
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 @implementation flarg : NSObject
 
@@ -80,9 +82,10 @@ JCCoordinates g_coords;
     g_play = true;
 }
 
-+(void) upload:(id)sender
++(void) save:(id)sender
 {
-    g_play = true;
+    userRecording.setRecording(delayedBuffer, 1); // save audio
+    userRecording.writeBufferToAudioFile(userRecording.getRecording(delayedBuffer, 1), fpath, 1, true);
 }
 
 @end
@@ -90,11 +93,11 @@ JCCoordinates g_coords;
 
 
 //-----------------------------------------------------------------------------
-// name: audio_callback()
-// desc: audio callback
+// Name: audio_callback()
+// Desc: audio callback
 //-----------------------------------------------------------------------------
 static int j = 0;
-static int k = j + 1;
+static int k = j + 1; // k will "tick" ever second
 void audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
 {
     // our x
@@ -113,45 +116,51 @@ void audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
         // set the y coordinate (with scaling)
         g_vertices[2*i+1] = buffer[2*i] * 2 * g_gfxHeight;
         
-        
+        // when record button is pressed
         if (g_listen)
         {
-        //    if (g_record_track) {
                 delayedBuffer[j] = buffer[i*2+1];
                 
                 if(j<(SRATE*DELAYTIME-1))
                 {
                     j++;
-                    if (j % SRATE == 0) k++;
+                    if (j % SRATE == 0) k++; // tick by "mod"ing every SRATE passing
                 }
                 else
                 {
-               //     g_record_track = false;
-                 //   g_listen = false;
-                    userRecording.setRecording(delayedBuffer, 1);
+                    g_listen = false;
                     
                     j = 0;
                     k = j + 1;
                 }
-            //}
-            
-   //     } else if (g_play) {
-            
-        } else delayedBuffer[i] = 0;
-   //     if(g_play)
-   //     {
-   //         buffer[i*2] = buffer[i*2+1] = delayedBuffer[j];
-    //    }
-        buffer[i*2] = buffer[i*2+1] = delayedBuffer[j];
+        }
         
-        
+        // when play button is pressed
+        if (g_play) {
+            
+            if(j<(SRATE*DELAYTIME-1))
+            {
+                j++;
+                if (j % SRATE == 0) k++;
+            }
+            else
+            {
+                g_play = false;
+                j = 0;
+                k = j + 1;
+            }
+        }
+       buffer[i*2] = buffer[i*2+1] = delayedBuffer[j]; // play shit
     }
-    
     // save the num frames
     g_numFrames = numFrames;
 }
 
 
+//-----------------------------------------------------------------------------
+// Name: isTouchingButton(CGPoint pt)
+// Desc: Decides whether or not touch is in radius of button activity
+//-----------------------------------------------------------------------------
 bool isTouchingButton(CGPoint pt)
 {
     
@@ -160,8 +169,8 @@ bool isTouchingButton(CGPoint pt)
 
 
 //-----------------------------------------------------------------------------
-// name: touch_callback()
-// desc: the touch call back
+// Name: touch_callback()
+// Desc: the touch call back
 //-----------------------------------------------------------------------------
 void touch_callback( NSSet * touches, UIView * view,
                      std::vector<MoTouchTrack> & tracks,
@@ -226,17 +235,68 @@ void touch_callback( NSSet * touches, UIView * view,
 
 
 //-----------------------------------------------------------------------------
-// name: loadTextures()
-// desc: loads the right texture based on the ol' switcheroo
+// Name: loadTextures()
+// Desc: loads the right texture based on the ol' switcheroo
 //-----------------------------------------------------------------------------
 void loadTextures()
 {
     int switcheroo;
+    
     if (k < 10) switcheroo = j/SRATE + 1;
     else if (k == 10) switcheroo = k;
 
     // if recording...
     if (g_listen) {
+        switch (switcheroo) {
+            case 0:
+                MoGfx::loadTexture(@"progress_10", @"png");
+                break;
+                
+            case 1:
+                MoGfx::loadTexture(@"progress_red_9", @"png");
+                break;
+                
+            case 2:
+                MoGfx::loadTexture(@"progress_red_8", @"png");
+                break;
+                
+            case 3:
+                MoGfx::loadTexture(@"progress_red_7", @"png");
+                break;
+                
+            case 4:
+                MoGfx::loadTexture(@"progress_red_6", @"png");
+                break;
+                
+            case 5:
+                MoGfx::loadTexture(@"progress_red_5", @"png");
+                break;
+                
+            case 6:
+                MoGfx::loadTexture(@"progress_red_4", @"png");
+                break;
+                
+            case 7:
+                MoGfx::loadTexture(@"progress_red_3", @"png");
+                break;
+                
+            case 8:
+                MoGfx::loadTexture(@"progress_red_2", @"png");
+                break;
+                
+            case 9:
+                MoGfx::loadTexture(@"progress_red_1", @"png");
+                break;
+                
+            case 10:
+                MoGfx::loadTexture(@"progress_red_0", @"png");
+                break;
+                
+            default:
+                MoGfx::loadTexture(@"progress_10", @"png");
+                break;
+        }
+    } else if (g_play) {
         switch (switcheroo) {
             case 0:
                 MoGfx::loadTexture(@"progress_10", @"png");
@@ -292,6 +352,10 @@ void loadTextures()
 }
 
 
+//-----------------------------------------------------------------------------
+// Name: loadEncouragements()
+// Desc: loads various encouragments when user records profile
+//-----------------------------------------------------------------------------
 void loadEncouragements()
 {
     switch (g_rand_texture) {
@@ -342,6 +406,10 @@ void loadEncouragements()
 }
 
 
+//-----------------------------------------------------------------------------
+// name: draw()
+// desc: draws stuff to the screen (progress bar, record button)
+//-----------------------------------------------------------------------------
 void draw(GLEntity entity, int num)
 {
     // for each entity
@@ -355,8 +423,8 @@ void draw(GLEntity entity, int num)
         
         //color
         GLfloat val = 1;
-        float v = val;
-        glColor4f(entity.col.x*v, entity.col.y*v, entity.col.z*v, val);
+        
+        glColor4f(entity.col.x, entity.col.y, entity.col.z, val);
         
         // vertex
         glVertexPointer( 2, GL_FLOAT, 0, g_coords.squareVertices );
@@ -378,8 +446,8 @@ void draw(GLEntity entity, int num)
 }
 
 //-----------------------------------------------------------------------------
-// name: drawEncouragements()
-// desc:
+// Name: drawEncouragements()
+// Desc: specific to encouragements, which are in motion and randomly placed
 //-----------------------------------------------------------------------------
 void drawEncouragements()
 {
@@ -436,8 +504,8 @@ void drawEncouragements()
 
 
 //-----------------------------------------------------------------------------
-// name: drawButton()
-// desc:
+// Name: drawButton()
+// Desc: record button
 //-----------------------------------------------------------------------------
 void drawButton()
 {
@@ -446,20 +514,20 @@ void drawButton()
 }
 
 //-----------------------------------------------------------------------------
-// name: drawProgressBar()
-// desc: draws triangle strips of texture to screen
+// Name: drawProgressBar()
+// Desc: progress bar
 //-----------------------------------------------------------------------------
 void drawProgressBar()
 {
-    // clear
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    
     loadTextures();
     draw(g_progress, NUM_PROGRESS);
 }
 
 
+//-----------------------------------------------------------------------------
+// Name: drawRecordScreen()
+// Desc: calls functions to draw everything you see on the record screen
+//-----------------------------------------------------------------------------
 void drawRecordScreen()
 {
     drawProgressBar();
@@ -470,18 +538,30 @@ void drawRecordScreen()
 }
 
 
+//-----------------------------------------------------------------------------
+// Name: initializeProgress()
+// Desc: Set coordinates of progress bar using class GLEntity
+//-----------------------------------------------------------------------------
 void initializeProgress()
 {
     g_progress.setProgressCoords();
 }
 
 
+//-----------------------------------------------------------------------------
+// Name: initializeButton()
+// Desc: Set coordinates of record button using class GLEntity
+//-----------------------------------------------------------------------------
 void initializeButton()
 {
     g_button.setButtonCoords();
 }
 
 
+//-----------------------------------------------------------------------------
+// Name: initializeEncouragements()
+// Desc: Set random coordinates of encouragements using class GLEntity
+//-----------------------------------------------------------------------------
 void initializeEncouragements()
 {
     for (int i = 0; i < NUM_ENCOURAGEMENTS; i++) {
@@ -490,8 +570,13 @@ void initializeEncouragements()
 }
 
 
+//-----------------------------------------------------------------------------
+// Name: initializeTextures()
+// Desc: Calls functions to initialize coordinates
+//-----------------------------------------------------------------------------
 void initializeTextures()
 {
+    
     initializeProgress();
     initializeButton();
     initializeEncouragements();
@@ -499,8 +584,8 @@ void initializeTextures()
 
 
 //-----------------------------------------------------------------------------
-// name: drawWaveforms()
-// desc: draws a time domain-amplitude graph in real time
+// Name: drawWaveforms()
+// Desc: Draws a time domain-amplitude graph in real time
 //-----------------------------------------------------------------------------
 void drawWaveforms()
 {
@@ -530,6 +615,11 @@ void drawWaveforms()
     glPopMatrix();
 }
 
+
+//-----------------------------------------------------------------------------
+// Name: GLoilerInitVisual()
+// Desc: GL stuff / MoGfx perspectives
+//-----------------------------------------------------------------------------
 void GLoilerInitVisual()
 {
     // projection
@@ -572,6 +662,10 @@ void GLoilerInitVisual()
 }
 
 
+//-----------------------------------------------------------------------------
+// Name: GLoilerInitTouch()
+// Desc: Add touch callback
+//-----------------------------------------------------------------------------
 void GLoilerInitTouch()
 {
     // set touch callback
@@ -601,12 +695,18 @@ void GLoilerInitAudio()
     }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Below are the three functions called by JCRecordViewController.mm
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
 
 //-----------------------------------------------------------------------------
-// name: GLoilerInit()
-// desc: initialize the engine (audio, gfx, interaction)
+// Name: JCRecordInit()
+// Desc: Initialize the engine (audio, gfx, interaction)
 //-----------------------------------------------------------------------------
-void GLoilerInit()
+void JCRecordInit()
 {
     NSLog( @"init..." );
     
@@ -617,21 +717,25 @@ void GLoilerInit()
 
 
 //-----------------------------------------------------------------------------
-// name: GLoilerSetDims( float width, float height )
-// desc: set graphics dimensions
+// Name: JCRecordSetDims( float width, float height )
+// Desc: Set graphics dimensions
 //-----------------------------------------------------------------------------
-void GLoilerSetDims( float width, float height )
+void JCRecordSetDims( float width, float height )
 {
     NSLog( @"set dims: %f %f", width, height );
 }
 
 
 //-----------------------------------------------------------------------------
-// name: GLoilerRender()
-// desc: draw next frame of graphics
+// Name: JCRecordRender()
+// Desc: Draw next frame of graphics
 //-----------------------------------------------------------------------------
-void GLoilerRender()
+void JCRecordRender()
 {
-//    drawWaveforms();
+    // clear
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    //    drawWaveforms();
     drawRecordScreen();
 }

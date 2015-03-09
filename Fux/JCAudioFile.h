@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Joel Chapman. All rights reserved.
 //
 
-#ifndef __JCAudioFile__h
-#define __JCAudioFile__h
+#ifndef __Fux__JCAudioFile__h
+#define __Fux__JCAudioFile__h
 
 #import <stdio.h>
 #import <stdlib.h>
@@ -19,7 +19,9 @@ public:
     JCAudioFile();
 
     void setRecording ( float tempBuffer[], int TRACKS );
+    float * getRecording( float tempBuffer[], int TRACKS );
     static int bufferSize();
+    void writeBufferToAudioFile(float buffer[], const char * fName, int mChannels, bool compress_with_m4a);
     
 private:
     float * recording;

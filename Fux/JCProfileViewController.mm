@@ -1,13 +1,13 @@
 //
-//  PFViewController.m
-//  PF
+//  JCProfileViewController.mm
+//  Fux
 //
-//  Created by Ge Wang on 1/15/15.
-//  Copyright (c) 2015 Ge Wang. All rights reserved.
+//  Created by Joel Chapman on 3/5/15.
+//  Copyright (c) 2015 Joel Chapman. All rights reserved.
+//  Using code from "Soundshare" by Michael Rotondo.
 //
 
-#import "PFViewController.h"
-#import "renderer.h"
+#import "JCProfileViewController.h"
 #import "mo-glut.h"
 #import "SoundShareClient.h"
 #import "AFHTTPRequestOperation.h"
@@ -18,14 +18,14 @@
 #import <CoreLocation/CoreLocation.h>
 
 #define SRATE 44100
-#define FRAMESIZE 512
+#define FRAMESIZE 1024
 #define NUM_CHANNELS 2
 
 stk::FileRead *fileReader = NULL;
 stk::StkFrames *readBuffer;
 static int sampleIndex = 0;
 
-@interface PFViewController () {
+@interface JCProfileViewController () {
     SoundShareClient *soundShareClient;
     CLLocationManager *locationManager;
 }
@@ -35,8 +35,8 @@ static int sampleIndex = 0;
 
 @end
 
-@implementation PFViewController
-//@synthesize soundTableView;
+@implementation JCProfileViewController
+@synthesize soundTableView;
 @synthesize nameTextField, descriptionTextField;
 @synthesize sounds;
 
@@ -79,7 +79,7 @@ static int sampleIndex = 0;
     [parameters setObject:[NSNumber numberWithFloat:longitude] forKey:@"long"];
     [parameters setObject:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"udid"];
     
-    __weak PFViewController *weakSelf = self;
+    __weak JCProfileViewController *weakSelf = self;
     
     // log
     NSLog( @"attempting to upload..." );
@@ -88,7 +88,7 @@ static int sampleIndex = 0;
  constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
      NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"turn" withExtension:@"wav"];
      NSData *fileData = [NSData dataWithContentsOfURL:fileURL];
-     [formData appendPartWithFileData:fileData name:@"soundfile" fileName:@"turn.wav" mimeType:@"audio/wav"];
+     [formData appendPartWithFileData:fileData name:@"turn" fileName:@"turn.wav" mimeType:@"audio/wav"];
  }
                    success:^(AFHTTPRequestOperation *operation, id responseObject) {
                        [weakSelf refresh];
@@ -97,11 +97,6 @@ static int sampleIndex = 0;
                        NSLog(@"FAILURE TO UPLOAD: %@", error);
                    }
      ];
-    //    AFHTTPRequestOperation *uploadOperation = [[AFHTTPRequestOperation alloc] initWithRequest:myRequest];
-    //    [uploadOperation setCompletionBlockWith];
-    //
-    //    NSOperationQueue *queue = [NSOperationQueue mainQueue];
-    //    [queue addOperation:uploadOperation];
 }
 
 
@@ -113,28 +108,14 @@ static int sampleIndex = 0;
     [locationManager startUpdatingLocation];
     
     soundShareClient = [SoundShareClient sharedClient];
-    
-  //  self.soundTableView.delegate = self;
-  //  self.soundTableView.dataSource = self;
+
     [self refresh];
 }
 
 
 - (void )refresh
 {
-    __weak PFViewController *weakSelf = self;
-    //    [[SoundShareClient sharedClient] getPath:@"soundshare/sounds" parameters:nil success:^(__unused AFHTTPRequestOperation *operation, id JSON) {
-    //        NSLog(@"GOT JSON: %@", JSON);
-    //
-    //        NSMutableArray *mutableRecords = [NSMutableArray array];
-    //        for (NSDictionary *sound in JSON) {
-    //            [mutableRecords addObject:sound];
-    //        }
-    //        weakSelf.sounds = mutableRecords;
-    //        [weakSelf.soundTableView reloadData];
-    //    } failure:^(__unused AFHTTPRequestOperation *operation, NSError *error) {
-    //        NSLog(@"FAILURE, %@", error);
-    //    }];
+    __weak JCProfileViewController *weakSelf = self;
     [[SoundShareClient sharedClient] GET:@"soundshare/sounds" parameters:nil success:^(__unused AFHTTPRequestOperation *operation, id JSON) {
         NSLog(@"GOT JSON: %@", JSON);
         
@@ -143,7 +124,6 @@ static int sampleIndex = 0;
             [mutableRecords addObject:sound];
         }
         weakSelf.sounds = mutableRecords;
-  //      [weakSelf.soundTableView reloadData];
     } failure:^(__unused AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"FAILURE, %@", error);
     }];
@@ -191,5 +171,6 @@ static int sampleIndex = 0;
 {
     return NO;
 }
+
 
 @end

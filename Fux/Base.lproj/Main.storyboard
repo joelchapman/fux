@@ -4,10 +4,10 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Profile View Controller-->
         <scene sceneID="ufC-wZ-h7g">
             <objects>
-                <viewController id="vXZ-lx-hvc" customClass="PFViewController" sceneMemberID="viewController">
+                <viewController id="vXZ-lx-hvc" customClass="JCProfileViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="qyf-fO-3Ez"/>
                         <viewControllerLayoutGuide type="bottom" id="MEH-jr-6Za"/>
@@ -41,28 +41,6 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="51A-8G-lfq">
-                                <rect key="frame" x="143" y="196" width="133" height="121"/>
-                                <state key="normal" title="Button" image="cloud.png">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="uploadSound:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="kcO-xs-ZkN"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ni6-jc-CqE">
-                                <rect key="frame" x="179" y="246" width="60" height="21"/>
-                                <attributedString key="attributedText">
-                                    <fragment content="CLOUD">
-                                        <attributes>
-                                            <color key="NSColor" cocoaTouchSystemColor="darkTextColor"/>
-                                            <font key="NSFont" size="17" name="HelveticaNeue"/>
-                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
-                                        </attributes>
-                                    </fragment>
-                                </attributedString>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Create your hot-ass profile" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YZj-In-0B6">
                                 <rect key="frame" x="52" y="65" width="204" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -75,6 +53,15 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JlM-TG-hoI">
+                                <rect key="frame" x="153" y="190" width="112" height="97"/>
+                                <state key="normal" title="Button" image="upload.png">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="uploadSound:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="frN-1g-dUy"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.75917376893939392" green="0.75917376893939392" blue="0.75917376893939392" alpha="1" colorSpace="calibratedRGB"/>
                     </view>
@@ -90,7 +77,7 @@
         <!--GLKit View Controller-->
         <scene sceneID="9dV-09-ICE">
             <objects>
-                <glkViewController preferredFramesPerSecond="30" id="eVI-v4-a52" customClass="GLoilerViewController" sceneMemberID="viewController">
+                <glkViewController preferredFramesPerSecond="30" id="eVI-v4-a52" customClass="JCRecordViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="HMt-A5-H7A"/>
                         <viewControllerLayoutGuide type="bottom" id="69y-Zi-3fb"/>
@@ -109,7 +96,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OOc-ls-REA">
-                                <rect key="frame" x="109" y="196" width="105" height="95"/>
+                                <rect key="frame" x="135" y="270" width="53" height="48"/>
                                 <state key="normal" title="Button" image="record_button.png">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -118,7 +105,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N1q-LF-qGP">
-                                <rect key="frame" x="129" y="270" width="64" height="59"/>
+                                <rect key="frame" x="137" y="334" width="49" height="45"/>
                                 <state key="normal" title="Button" image="play.png">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -126,13 +113,13 @@
                                     <action selector="play:" destination="eVI-v4-a52" eventType="touchUpInside" id="o2c-tS-gfc"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lcw-j0-BSP">
-                                <rect key="frame" x="104" y="299" width="114" height="104"/>
-                                <state key="normal" title="Button" image="cloud.png">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ieh-Wm-4zS">
+                                <rect key="frame" x="127" y="383" width="69" height="59"/>
+                                <state key="normal" title="Button" image="upload.png">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="upload:" destination="eVI-v4-a52" eventType="touchUpInside" id="m82-kE-swd"/>
+                                    <action selector="save:" destination="eVI-v4-a52" eventType="touchUpInside" id="LG1-EP-Uvx"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -148,9 +135,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="cloud.png" width="512" height="512"/>
         <image name="play.png" width="512" height="512"/>
         <image name="record_button.png" width="512" height="512"/>
+        <image name="upload.png" width="346" height="346"/>
     </resources>
     <color key="tintColor" red="1" green="0.0" blue="0.010051519906341788" alpha="1" colorSpace="calibratedRGB"/>
 </document>

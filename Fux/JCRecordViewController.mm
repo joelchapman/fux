@@ -1,18 +1,20 @@
 //
-//  GLamorViewController.m
-//  GLamor
+//  JCRecordViewController.mm
+//  Fux
 //
-//  Created by Ge Wang on 1/21/14.
-//  Copyright (c) 2014 Ge Wang. All rights reserved.
+//  Created by Joel Chapman on 2/22/15.
+//  Copyright (c) 2015 Joel Chapman. All rights reserved.
+//  Using boiler-plate code from "Gloiler" (including MOMU) by Ge Wang.
 //
 
-#import "GLoilerViewController.h"
-#import "renderer.h"
+#import "JCRecordViewController.h"
+#import "JCRecordRenderer.h"
+#import "JCAudioFile.h"
 #import "mo-glut.h"
 #import <iostream>
 
 
-@interface GLoilerViewController () {
+@interface JCRecordViewController () {
 
 }
 
@@ -24,7 +26,7 @@
 
 @end
 
-@implementation GLoilerViewController
+@implementation JCRecordViewController
 
 - (void)viewDidLoad
 {
@@ -43,13 +45,13 @@
     [self setupGL];
     
     // initialize
-    GLoilerInit();
+    JCRecordInit();
 }
 
 
 - (void)viewDidLayoutSubviews
 {
-    GLoilerSetDims( self.view.bounds.size.width, self.view.bounds.size.height );
+    JCRecordSetDims( self.view.bounds.size.width, self.view.bounds.size.height );
 }
 
 
@@ -100,9 +102,9 @@
     [flarg play:sender];
 }
 
--(IBAction) upload:(id)sender
+-(IBAction) save:(id)sender
 {
-    [flarg upload:sender];
+    [flarg save:sender];
 }
 
 
@@ -112,7 +114,7 @@
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    GLoilerRender();
+    JCRecordRender();
 }
 
 @end

@@ -1,14 +1,15 @@
 //
-//  PFViewController.h
-//  GLoiler
+//  JCProfileViewController.h
+//  Fux
 //
-//  Created by Ge Wang on 1/15/15.
-//  Copyright (c) 2015 Ge Wang. All rights reserved.
+//  Created by Joel Chapman on 3/5/15.
+//  Copyright (c) 2015 Joel Chapman. All rights reserved.
+//  Using code from "Soundshare" by Michael Rotondo.
 //
 
 #import <UIKit/UIKit.h>
 
-@interface PFViewController : UIViewController
+@interface JCProfileViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 
 @property (strong, nonatomic) IBOutlet UITableView *soundTableView;
 @property (strong, nonatomic) IBOutlet UITextField *nameTextField;

@@ -14,7 +14,7 @@
 #define NOTHING 0
 
 #define PROG_LOCX 0
-#define PROG_LOCY 0.5
+#define PROG_LOCY 0.2
 #define PROG_LOCZ 4
 #define PROG_SCA 1.2
 
