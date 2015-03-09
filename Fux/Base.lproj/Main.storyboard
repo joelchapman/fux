@@ -59,7 +59,7 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="uploadSound:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="frN-1g-dUy"/>
+                                    <action selector="uploadSound:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="0Tm-Zp-6bN"/>
                                 </connections>
                             </button>
                         </subviews>

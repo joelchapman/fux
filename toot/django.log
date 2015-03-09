@@ -289,3 +289,70 @@
 2015-03-09 04:57:15,178 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'62B0BD51-6E4E-4F7C-8D83-93FF7FB65EDA'], u'description': [u'vtvg'], u'long': [u'0'], u'name': [u'vgfcvd']}>
 2015-03-09 04:57:15,178 DEBUG NAME: vgfcvd
 2015-03-09 04:57:15,179 DEBUG "'soundfile'"
+2015-03-09 05:08:22,620 DEBUG (0.001) QUERY = "\n            SELECT name FROM sqlite_master\n            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'\n            ORDER BY name" - PARAMS = (); args=None
+2015-03-09 05:08:22,624 DEBUG (0.000) QUERY = u'SELECT "django_migrations"."app", "django_migrations"."name" FROM "django_migrations"' - PARAMS = (); args=()
+2015-03-09 05:08:34,674 DEBUG (0.001) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:08:45,915 DEBUG (0.001) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:08:50,896 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u'cfv'], u'long': [u'0'], u'name': [u'gvf']}>
+2015-03-09 05:08:50,896 DEBUG NAME: gvf
+2015-03-09 05:08:50,896 DEBUG "'soundfile'"
+2015-03-09 05:12:04,578 DEBUG (0.000) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:12:05,479 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u''], u'long': [u'0'], u'name': [u'']}>
+2015-03-09 05:12:05,479 DEBUG NAME: 
+2015-03-09 05:12:05,480 DEBUG "'soundfile'"
+2015-03-09 05:12:09,762 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u'bgvf'], u'long': [u'0'], u'name': [u'gvfcd']}>
+2015-03-09 05:12:09,762 DEBUG NAME: gvfcd
+2015-03-09 05:12:09,762 DEBUG "'soundfile'"
+2015-03-09 05:12:10,809 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u'bgvf'], u'long': [u'0'], u'name': [u'gvfcd']}>
+2015-03-09 05:12:10,809 DEBUG NAME: gvfcd
+2015-03-09 05:12:10,810 DEBUG "'soundfile'"
+2015-03-09 05:21:56,727 DEBUG (0.000) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:21:57,835 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u''], u'long': [u'0'], u'name': [u'']}>
+2015-03-09 05:21:57,836 DEBUG NAME: 
+2015-03-09 05:21:57,836 DEBUG "'soundfile'"
+2015-03-09 05:22:49,489 DEBUG (0.001) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:22:53,450 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u'fcgv'], u'long': [u'0'], u'name': [u'hgvf']}>
+2015-03-09 05:22:53,450 DEBUG NAME: hgvf
+2015-03-09 05:22:53,451 DEBUG "'soundfile'"
+2015-03-09 05:34:52,704 DEBUG (0.001) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:34:53,833 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u''], u'long': [u'0'], u'name': [u'']}>
+2015-03-09 05:34:53,833 DEBUG NAME: 
+2015-03-09 05:34:53,833 DEBUG "'soundfile'"
+2015-03-09 05:35:00,403 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u'hrg'], u'long': [u'0'], u'name': [u'gdv']}>
+2015-03-09 05:35:00,403 DEBUG NAME: gdv
+2015-03-09 05:35:00,403 DEBUG "'soundfile'"
+2015-03-09 05:36:26,607 DEBUG (0.000) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:36:27,619 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'62B0BD51-6E4E-4F7C-8D83-93FF7FB65EDA'], u'description': [u''], u'long': [u'0'], u'name': [u'']}>
+2015-03-09 05:36:27,619 DEBUG NAME: 
+2015-03-09 05:36:27,619 DEBUG "'soundfile'"
+2015-03-09 05:36:32,408 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'62B0BD51-6E4E-4F7C-8D83-93FF7FB65EDA'], u'description': [u'jthrg'], u'long': [u'0'], u'name': [u'jtgf']}>
+2015-03-09 05:36:32,408 DEBUG NAME: jtgf
+2015-03-09 05:36:32,408 DEBUG "'soundfile'"
+2015-03-09 05:37:58,112 DEBUG (0.000) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:38:02,420 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u'vgb'], u'long': [u'0'], u'name': [u'bgvf']}>
+2015-03-09 05:38:02,420 DEBUG NAME: bgvf
+2015-03-09 05:38:02,420 DEBUG "'soundfile'"
+2015-03-09 05:41:36,055 DEBUG (0.000) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:41:39,785 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4'], u'description': [u'cfv'], u'long': [u'0'], u'name': [u'bvcv']}>
+2015-03-09 05:41:39,785 DEBUG NAME: bvcv
+2015-03-09 05:41:39,791 DEBUG (0.000) QUERY = u'BEGIN' - PARAMS = (); args=None
+2015-03-09 05:41:39,794 WARNING /Library/Python/2.7/site-packages/django/db/models/fields/__init__.py:1282: RuntimeWarning: DateTimeField Sound.pub_date received a naive datetime (2015-03-09 05:41:39.785568) while time zone support is active.
+  RuntimeWarning)
+
+2015-03-09 05:41:39,796 DEBUG (0.002) QUERY = u'INSERT INTO "soundshare_sound" ("name", "description", "path", "pub_date", "likes", "udid", "lat", "long") VALUES (%s, %s, %s, %s, %s, %s, %s, %s)' - PARAMS = (u'bvcv', u'cfv', u'turn.wav', u'2015-03-09 05:41:39.785568', 0, u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4', 0.0, 0.0); args=[u'bvcv', u'cfv', u'turn.wav', u'2015-03-09 05:41:39.785568', 0, u'94F2FCC5-BF2F-4F13-94E7-265FBBBFB7E4', 0.0, 0.0]
+2015-03-09 05:41:39,800 DEBUG this is the sound id: 7
+2015-03-09 05:41:39,801 DEBUG (0.000) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" WHERE "soundshare_sound"."id" = %s' - PARAMS = (7,); args=(7,)
+2015-03-09 05:41:39,808 DEBUG (0.001) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:41:50,830 DEBUG (0.000) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:42:10,677 DEBUG (0.001) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:42:16,852 DEBUG <QueryDict: {u'lat': [u'0'], u'udid': [u'62B0BD51-6E4E-4F7C-8D83-93FF7FB65EDA'], u'description': [u'yep'], u'long': [u'0'], u'name': [u'thisllwork']}>
+2015-03-09 05:42:16,852 DEBUG NAME: thisllwork
+2015-03-09 05:42:16,853 DEBUG (0.000) QUERY = u'BEGIN' - PARAMS = (); args=None
+2015-03-09 05:42:16,854 WARNING /Library/Python/2.7/site-packages/django/db/models/fields/__init__.py:1282: RuntimeWarning: DateTimeField Sound.pub_date received a naive datetime (2015-03-09 05:42:16.853009) while time zone support is active.
+  RuntimeWarning)
+
+2015-03-09 05:42:16,855 DEBUG (0.001) QUERY = u'INSERT INTO "soundshare_sound" ("name", "description", "path", "pub_date", "likes", "udid", "lat", "long") VALUES (%s, %s, %s, %s, %s, %s, %s, %s)' - PARAMS = (u'thisllwork', u'yep', u'turn.wav', u'2015-03-09 05:42:16.853009', 0, u'62B0BD51-6E4E-4F7C-8D83-93FF7FB65EDA', 0.0, 0.0); args=[u'thisllwork', u'yep', u'turn.wav', u'2015-03-09 05:42:16.853009', 0, u'62B0BD51-6E4E-4F7C-8D83-93FF7FB65EDA', 0.0, 0.0]
+2015-03-09 05:42:16,856 DEBUG this is the sound id: 8
+2015-03-09 05:42:16,856 DEBUG (0.000) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" WHERE "soundshare_sound"."id" = %s' - PARAMS = (8,); args=(8,)
+2015-03-09 05:42:16,862 DEBUG (0.001) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()
+2015-03-09 05:42:23,790 DEBUG (0.000) QUERY = u'SELECT "soundshare_sound"."id", "soundshare_sound"."name", "soundshare_sound"."description", "soundshare_sound"."path", "soundshare_sound"."pub_date", "soundshare_sound"."likes", "soundshare_sound"."udid", "soundshare_sound"."lat", "soundshare_sound"."long" FROM "soundshare_sound" ORDER BY "soundshare_sound"."pub_date" DESC' - PARAMS = (); args=()

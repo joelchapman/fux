@@ -71,6 +71,7 @@ static int sampleIndex = 0;
     [parameters setObject:nameTextField.text forKey:@"name"];
     [parameters setObject:descriptionTextField.text forKey:@"description"];
     
+    
     CLLocation *location = [locationManager location];
     CLLocationCoordinate2D coordinate = location.coordinate;
     CLLocationDegrees latitude = coordinate.latitude;
@@ -88,7 +89,7 @@ static int sampleIndex = 0;
  constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
      NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"turn" withExtension:@"wav"];
      NSData *fileData = [NSData dataWithContentsOfURL:fileURL];
-     [formData appendPartWithFileData:fileData name:@"turn" fileName:@"turn.wav" mimeType:@"audio/wav"];
+     [formData appendPartWithFileData:fileData name:@"soundfile" fileName:@"turn.wav" mimeType:@"audio/wav"];
  }
                    success:^(AFHTTPRequestOperation *operation, id responseObject) {
                        [weakSelf refresh];
@@ -97,6 +98,7 @@ static int sampleIndex = 0;
                        NSLog(@"FAILURE TO UPLOAD: %@", error);
                    }
      ];
+    
 }
 
 
