@@ -100,6 +100,7 @@
 		5DF18F021AAAE27500A9BA8E /* progress_red_9.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DF18EF81AAAE27500A9BA8E /* progress_red_9.png */; };
 		5DF18F041AAAE48600A9BA8E /* progress_red_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DF18F031AAAE48600A9BA8E /* progress_red_2.png */; };
 		5DF18F061AAAEF7800A9BA8E /* upload.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DF18F051AAAEF7800A9BA8E /* upload.png */; };
+		5DF18F0D1AAE68AE00A9BA8E /* audioprofile.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5DF18F0C1AAE66DB00A9BA8E /* audioprofile.m4a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -254,6 +255,7 @@
 		5DF18EF81AAAE27500A9BA8E /* progress_red_9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = progress_red_9.png; path = "Supporting Files/Images/Progress/progress_red_9.png"; sourceTree = "<group>"; };
 		5DF18F031AAAE48600A9BA8E /* progress_red_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = progress_red_2.png; path = "Supporting Files/Images/Progress/progress_red_2.png"; sourceTree = "<group>"; };
 		5DF18F051AAAEF7800A9BA8E /* upload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upload.png; sourceTree = "<group>"; };
+		5DF18F0C1AAE66DB00A9BA8E /* audioprofile.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = audioprofile.m4a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -581,6 +583,7 @@
 		5DF18EEB1AA9A23500A9BA8E /* Recordings */ = {
 			isa = PBXGroup;
 			children = (
+				5DF18F0C1AAE66DB00A9BA8E /* audioprofile.m4a */,
 				5DF18EEC1AA9A23500A9BA8E /* Test */,
 			);
 			name = Recordings;
@@ -676,6 +679,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5DF18F0D1AAE68AE00A9BA8E /* audioprofile.m4a in Resources */,
 				5DF18F001AAAE27500A9BA8E /* progress_red_7.png in Resources */,
 				5D8712131A9A7B8C006E3E90 /* Main.storyboard in Resources */,
 				5DD3991E1AA457F1000ED696 /* progress_6.png in Resources */,

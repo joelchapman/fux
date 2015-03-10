@@ -30,6 +30,4 @@ void JCRecordRender();
 +(void) save:(id)sender;
 @end
 
-//bool listen();
-
 #endif /* defined(__GLoiler__renderer__) */

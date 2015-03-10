@@ -11,6 +11,7 @@
 #import "JCRecordRenderer.h"
 #import "JCAudioFile.h"
 #import "mo-glut.h"
+#import "mo-audio.h"
 #import <iostream>
 
 

@@ -191,5 +191,5 @@ void JCAudioFile::writeBufferToAudioFile(float buffer[], const char *fName, int 
     ExtAudioFileDispose(audiofileRef);
     
     
-    cout << "Done!" << endl;
+    cout << "Audio profile saved" << endl;
 }

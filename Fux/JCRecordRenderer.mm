@@ -47,7 +47,7 @@ SAMPLE g_vertices[FRAMESIZE*2]; //used for drawing waveforms
 static UInt32 g_numFrames;
 int delaySize = JCAudioFile::bufferSize();
 static Float32 delayedBuffer[SRATE*DELAYTIME]; //temp buffer to record audio
-const char * fpath = "/Users/Joel/Documents/Academic/College/Coterm\ Year/256b/Fux/Fux/Supporting\ Files/Recordings/audio_profile.m4a";
+const char * fpath = "/Users/Joel/Documents/Academic/College/Coterm\ Year/256b/Fux/Fux/Supporting\ Files/Recordings/audioprofile.m4a";
 
 // Texture globals
 static GLuint g_texture[1];
@@ -84,7 +84,7 @@ JCAudioFile userRecording;
 
 +(void) save:(id)sender
 {
-    userRecording.setRecording(delayedBuffer, 1); // save audio
+  //  userRecording.setRecording(delayedBuffer, 1); // save audio
     userRecording.writeBufferToAudioFile(userRecording.getRecording(delayedBuffer, 1), fpath, 1, true);
 }
 
