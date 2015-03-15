@@ -44,9 +44,10 @@ int JCAudioFile::bufferSize()
 
 
 // void writeBufferToAudioFile adapted from writeNoiseToAudioFile, written by Adam Stark
-void JCAudioFile::writeBufferToAudioFile(float buffer[], const char *fName, int mChannels, bool compress_with_m4a)
+void JCAudioFile::writeBufferToAudioFile(float buffer[], const char * fName, int mChannels, bool compress_with_m4a)
 {
     OSStatus err; // to record errors from ExtAudioFile API functions
+    
     
     // create file path as CStringRef
     CFStringRef fPath;
@@ -162,7 +163,6 @@ void JCAudioFile::writeBufferToAudioFile(float buffer[], const char *fName, int 
     
     // Tell the ExtAudioFile API what format we'll be sending samples in
     err = ExtAudioFileSetProperty(audiofileRef, kExtAudioFileProperty_ClientDataFormat, sizeof(localFormat), &localFormat);
- //   cout << outputData.mBuffers[0].mDataByteSize << endl;
     
     if (err != noErr)
     {
@@ -191,5 +191,5 @@ void JCAudioFile::writeBufferToAudioFile(float buffer[], const char *fName, int 
     ExtAudioFileDispose(audiofileRef);
     
     
-    cout << "Audio profile saved" << endl;
+    cout << "Audio profile saved!" << endl;
 }

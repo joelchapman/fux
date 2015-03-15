@@ -27,9 +27,11 @@ using namespace std;
 #define DELAYTIME 10
 #define NUM_CHANNELS 2
 
+#define SOLO 1
 #define NUM_PROGRESS 1
 #define NUM_BUTTONS 1
 #define NUM_ENCOURAGEMENTS 1
+#define NUM_TITS 2
 #define NUM_ENCOURAGEMENT_PNGS 10
 #define Z_CLOSE 4.0
 
@@ -47,7 +49,6 @@ SAMPLE g_vertices[FRAMESIZE*2]; //used for drawing waveforms
 static UInt32 g_numFrames;
 int delaySize = JCAudioFile::bufferSize();
 static Float32 delayedBuffer[SRATE*DELAYTIME]; //temp buffer to record audio
-const char * fpath = "/Users/Joel/Documents/Academic/College/Coterm\ Year/256b/Fux/Fux/Supporting\ Files/Recordings/audioprofile.m4a";
 
 // Texture globals
 static GLuint g_texture[1];
@@ -59,11 +60,18 @@ static bool g_next_encouragement = false;
 static bool g_play = false; // when true, plays audio
 
 // Class instantiations
+GLEntity g_title;
+GLEntity g_title_back;
 GLEntity g_progress;
 GLEntity g_button;
 GLEntity g_encouragements[NUM_ENCOURAGEMENTS];
 JCCoordinates g_coords;
 JCAudioFile userRecording;
+
+NSURL * profileURL = [[NSBundle mainBundle] URLForResource:@"audioprofile" withExtension:@"m4a"];
+NSString * fileString = [profileURL absoluteString];
+NSString * ff = [fileString substringFromIndex:7];
+const char * fpath = [ff UTF8String];
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -84,12 +92,10 @@ JCAudioFile userRecording;
 
 +(void) save:(id)sender
 {
-  //  userRecording.setRecording(delayedBuffer, 1); // save audio
     userRecording.writeBufferToAudioFile(userRecording.getRecording(delayedBuffer, 1), fpath, 1, true);
 }
 
 @end
-
 
 
 //-----------------------------------------------------------------------------
@@ -445,6 +451,7 @@ void draw(GLEntity entity, int num)
     }
 }
 
+
 //-----------------------------------------------------------------------------
 // Name: drawEncouragements()
 // Desc: specific to encouragements, which are in motion and randomly placed
@@ -525,11 +532,28 @@ void drawProgressBar()
 
 
 //-----------------------------------------------------------------------------
+// Name: drawTitle()
+// Desc: title
+//-----------------------------------------------------------------------------
+void drawTitle()
+{
+    MoGfx::loadTexture(@"title", @"png");
+    draw(g_title, SOLO);
+    MoGfx::loadTexture(@"blank", @"png");
+    draw(g_title_back, SOLO);
+    
+}
+
+
+//-----------------------------------------------------------------------------
 // Name: drawRecordScreen()
 // Desc: calls functions to draw everything you see on the record screen
 //-----------------------------------------------------------------------------
 void drawRecordScreen()
 {
+    if (!g_play && !g_listen) {
+        drawTitle();
+    }
     drawProgressBar();
     drawButton();
     if (g_listen) {
@@ -537,6 +561,24 @@ void drawRecordScreen()
     }
 }
 
+
+//-----------------------------------------------------------------------------
+// Name: initializeTitleBack()
+// Desc: Set coordinates of title background using class GLEntity
+//-----------------------------------------------------------------------------
+void initializeTitleBack()
+{
+    g_title_back.setTitleBackCoords();
+}
+
+//-----------------------------------------------------------------------------
+// Name: initializeTitle()
+// Desc: Set coordinates of title using class GLEntity
+//-----------------------------------------------------------------------------
+void initializeTitle()
+{
+    g_title.setTitleCoords();
+}
 
 //-----------------------------------------------------------------------------
 // Name: initializeProgress()
@@ -576,7 +618,8 @@ void initializeEncouragements()
 //-----------------------------------------------------------------------------
 void initializeTextures()
 {
-    
+    initializeTitle();
+   // initializeTitleBack();
     initializeProgress();
     initializeButton();
     initializeEncouragements();
@@ -681,8 +724,8 @@ void GLoilerInitAudio()
     if( !result )
     {
         // do not do this:
-        int * p = 0;
-        *p = 0;
+    //    int * p = 0;
+    //    *p = 0;
     }
     
     // start
@@ -690,8 +733,8 @@ void GLoilerInitAudio()
     if( !result )
     {
         // do not do this:
-        int * p = 0;
-        *p = 0;
+     //   int * p = 0;
+     //   *p = 0;
     }
 }
 

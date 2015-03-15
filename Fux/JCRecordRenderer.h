@@ -23,7 +23,7 @@ void JCRecordSetDims( float width, float height );
 // draw next frame of graphics
 void JCRecordRender();
 
-// record
+// record interface
 @interface flarg : NSObject
 +(void) record:(id)sender;
 +(void) play:(id)sender;

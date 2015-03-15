@@ -13,6 +13,17 @@
 #define ALL 1
 #define NOTHING 0
 
+#define TIT_LOCX 0
+#define TIT_LOCY 0.9
+#define TIT_LOCZ 4
+#define TIT_SCA_X 1.5
+#define TIT_SCA_Y 2
+#define TIT_SCA_Z 1
+
+#define TIT_BACK_SCA_X 1.6
+#define TIT_BACK_SCA_Y 0.7
+#define TIT_BACK_SCA_Z 1
+
 #define PROG_LOCX 0
 #define PROG_LOCY 0.2
 #define PROG_LOCZ 4
@@ -38,6 +49,28 @@
 #define BOUNCE 0
 #define BOUNCE_RATE 0
 
+
+void GLEntity::setTitleBackCoords()
+{
+    loc = Vector3D(TIT_LOCX, TIT_LOCY, TIT_LOCZ);
+    ori = Vector3D(ORI, ORI, ORI);
+    sca = Vector3D(TIT_BACK_SCA_X, TIT_BACK_SCA_Y, TIT_BACK_SCA_Z);
+    vel = Vector3D(VEL, VEL, VEL);
+    col = Vector3D(0.4, NOTHING, ALL);
+    bounce = BOUNCE;
+    bounce_rate = BOUNCE_RATE;
+}
+
+void GLEntity::setTitleCoords()
+{
+    loc = Vector3D(TIT_LOCX, TIT_LOCY, TIT_LOCZ);
+    ori = Vector3D(ORI, ORI, ORI);
+    sca = Vector3D(TIT_SCA_X, TIT_SCA_Y, TIT_SCA_Z);
+    vel = Vector3D(VEL, VEL, VEL);
+    col = Vector3D(ALL, ALL, ALL);
+    bounce = BOUNCE;
+    bounce_rate = BOUNCE_RATE;
+}
 
 void GLEntity::setProgressCoords()
 {

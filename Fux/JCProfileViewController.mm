@@ -16,6 +16,7 @@
 #import "FileRead.h"
 #import "Stk.h"
 #import <iostream>
+#import <stdio.h>
 
 #define SRATE 44100
 #define FRAMESIZE 512
@@ -39,7 +40,6 @@ stk::StkFrames * readBuffer;
 @synthesize nameTextField, descriptionTextField;
 @synthesize sounds;
 
-
 -(IBAction) uploadSound:(id)sender
 {
     [nameTextField resignFirstResponder];
@@ -50,6 +50,7 @@ stk::StkFrames * readBuffer;
     
     [parameters setObject:nameTextField.text forKey:@"name"];
     [parameters setObject:descriptionTextField.text forKey:@"description"];
+    
     
     CLLocation * location = [locationManager location];
     CLLocationCoordinate2D coordinate = location.coordinate;
@@ -70,11 +71,14 @@ stk::StkFrames * readBuffer;
                 parameters:parameters
  constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
      NSURL * fileURL = [[NSBundle mainBundle] URLForResource:@"audioprofile" withExtension:@"m4a"];
-     NSData * fileData = [NSData dataWithContentsOfURL:fileURL];
-  //  NSString * newString = [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
-   //  std::cout << newString << std::endl;
      
-     [formData appendPartWithFileData:fileData name:@"soundfile" fileName:@"audioprofile.m4a" mimeType:@"audio/m4a"];
+     // generate a unique filename for recording upload
+     NSData * fileData = [NSData dataWithContentsOfURL:fileURL];
+     NSString * userName = nameTextField.text;
+     NSString * uniqueAudioProfileTemp = [@"audioprofile_" stringByAppendingString: userName];
+     NSString * uniqueAudioProfile = [uniqueAudioProfileTemp stringByAppendingString:@".m4a"];
+     
+     [formData appendPartWithFileData:fileData name:@"soundfile" fileName:uniqueAudioProfile mimeType:@"audio/m4a"];
  }
                    success:^(AFHTTPRequestOperation * operation, id responseObject) {
                        [weakSelf refresh];
@@ -161,11 +165,11 @@ stk::StkFrames * readBuffer;
 {
     __weak JCProfileViewController * weakSelf = self;
     
-    [[SoundShareClient sharedClient] GET:@"soundshare/sounds" parameters:nil success:^(__unused AFHTTPRequestOperation *operation, id JSON) {
+    [[SoundShareClient sharedClient] GET:@"soundshare/sounds" parameters:nil success:^(__unused AFHTTPRequestOperation * operation, id JSON) {
         NSLog(@"GOT JSON: %@", JSON);
         
-        NSMutableArray *mutableRecords = [NSMutableArray array];
-        for (NSDictionary *sound in JSON) {
+        NSMutableArray * mutableRecords = [NSMutableArray array];
+        for (NSDictionary * sound in JSON) {
             [mutableRecords addObject:sound];
         }
         weakSelf.sounds = mutableRecords;

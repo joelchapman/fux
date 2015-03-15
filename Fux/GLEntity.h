@@ -30,7 +30,8 @@ public:
     GLfloat bounce;
     GLfloat bounce_rate;
     
-    
+    void setTitleBackCoords();
+    void setTitleCoords();
     void setProgressCoords();
     void setButtonCoords();
     void setRandomCoords();

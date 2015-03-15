@@ -16,7 +16,7 @@
 @property (strong, nonatomic) IBOutlet UITextField *descriptionTextField;
 @property (strong, nonatomic) NSArray *sounds;
 
-- (IBAction)uploadSound:(id)sender;
+-(IBAction) uploadSound:(id)sender;
 
 @end
 
