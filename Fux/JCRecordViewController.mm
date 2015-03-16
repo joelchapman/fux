@@ -105,6 +105,8 @@
 
 -(IBAction) save:(id)sender
 {
+    MoAudio::stop();
+    NSLog(@"audio_callback has stopped");
     [flarg save:sender];
 }
 

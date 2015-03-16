@@ -68,7 +68,7 @@ GLEntity g_encouragements[NUM_ENCOURAGEMENTS];
 JCCoordinates g_coords;
 JCAudioFile userRecording;
 
-NSURL * profileURL = [[NSBundle mainBundle] URLForResource:@"audioprofile" withExtension:@"m4a"];
+NSURL * profileURL = [[NSBundle mainBundle] URLForResource:@"audioprofile" withExtension:@"wav"];
 NSString * fileString = [profileURL absoluteString];
 NSString * ff = [fileString substringFromIndex:7];
 const char * fpath = [ff UTF8String];
@@ -92,7 +92,7 @@ const char * fpath = [ff UTF8String];
 
 +(void) save:(id)sender
 {
-    userRecording.writeBufferToAudioFile(userRecording.getRecording(delayedBuffer, 1), fpath, 1, true);
+    userRecording.writeBufferToAudioFile(userRecording.getRecording(delayedBuffer, 1), fpath, 1, false);
 }
 
 @end
@@ -116,16 +116,16 @@ void audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
     {
         
         // set to current x value
-        g_vertices[2*i] = x;
+        g_vertices[NUM_CHANNELS*i] = x;
         // increment x
         x += inc;
         // set the y coordinate (with scaling)
-        g_vertices[2*i+1] = buffer[2*i] * 2 * g_gfxHeight;
+        g_vertices[NUM_CHANNELS*i+1] = buffer[NUM_CHANNELS*i] * 2 * g_gfxHeight;
         
         // when record button is pressed
         if (g_listen)
         {
-                delayedBuffer[j] = buffer[i*2+1];
+                delayedBuffer[j] = buffer[i*NUM_CHANNELS+1];
                 
                 if(j<(SRATE*DELAYTIME-1))
                 {
@@ -156,7 +156,7 @@ void audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
                 k = j + 1;
             }
         }
-       buffer[i*2] = buffer[i*2+1] = delayedBuffer[j]; // play shit
+       buffer[i*NUM_CHANNELS] = buffer[i*NUM_CHANNELS+1] = delayedBuffer[j]; // play shit
     }
     // save the num frames
     g_numFrames = numFrames;
@@ -712,7 +712,7 @@ void GLoilerInitVisual()
 void GLoilerInitTouch()
 {
     // set touch callback
-    MoTouch::addCallback( touch_callback, NULL );
+ //   MoTouch::addCallback( touch_callback, NULL );
 }
 
 void GLoilerInitAudio()

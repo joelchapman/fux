@@ -8,7 +8,7 @@
 
 #import "JCProfileViewController.h"
 #import "SoundShareClient.h"
-#import "JCRecordRenderer.h"
+//#import "JCRecordRenderer.h"
 #import "AFHTTPRequestOperation.h"
 #import <CoreLocation/CoreLocation.h>
 
@@ -19,11 +19,38 @@
 #import <stdio.h>
 
 #define SRATE 44100
-#define FRAMESIZE 512
+#define FRAMESIZE 1024
 #define NUMCHANNELS 2
 
 stk::FileRead * fileReader = NULL;
 stk::StkFrames * readBuffer;
+static int sampleIndex = 0;
+
+
+void audioCallback(Float32 * buff, UInt32 frameSize, void * userData);
+void audioCallback(Float32 * buff, UInt32 frameSize, void * userData)
+{
+    bool didRead = false;
+    if (fileReader && sampleIndex < fileReader->fileSize())
+    {
+        fileReader->read(*readBuffer, sampleIndex);
+        sampleIndex += FRAMESIZE;
+        didRead = true;
+    }
+    for (int i = 0; i < frameSize; i++)
+    {
+        if (readBuffer && didRead)
+        {
+            buff[i * NUMCHANNELS] = buff[i * NUMCHANNELS + 1] = (*readBuffer)[i * NUMCHANNELS];
+            buff[i * NUMCHANNELS + 1] = buff[i * NUMCHANNELS] = (*readBuffer)[i * NUMCHANNELS + 1];
+        }
+        else
+        {
+            buff[i * NUMCHANNELS] = buff[i * NUMCHANNELS + 1] = 0;
+        }
+    }
+}
+
 
 @interface JCProfileViewController ()
 {
@@ -32,6 +59,7 @@ stk::StkFrames * readBuffer;
 }
 
 - (void)refresh;
+- (void)playSoundAtURL:(NSURL *)url;
 
 @end
 
@@ -39,6 +67,22 @@ stk::StkFrames * readBuffer;
 @synthesize soundTableView;
 @synthesize nameTextField, descriptionTextField;
 @synthesize sounds;
+
+
+-(void) playSoundAtURL:(NSURL *)url
+{
+    NSData * data = [NSData dataWithContentsOfURL:url];
+    NSArray * paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString * path = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"audioprofile.wav"];
+    NSLog(@"Tried to write to path: %@", path);
+    [data writeToFile:path atomically:NO];
+    
+    readBuffer = new stk::StkFrames(FRAMESIZE, 2);
+    fileReader = new stk::FileRead();
+    fileReader->open([path UTF8String]);
+    sampleIndex = 0;
+}
+
 
 -(IBAction) uploadSound:(id)sender
 {
@@ -70,15 +114,15 @@ stk::StkFrames * readBuffer;
     [soundShareClient POST:@"soundshare/sound"
                 parameters:parameters
  constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
-     NSURL * fileURL = [[NSBundle mainBundle] URLForResource:@"audioprofile" withExtension:@"m4a"];
+     NSURL * fileURL = [[NSBundle mainBundle] URLForResource:@"audioprofile" withExtension:@"wav"];
      
      // generate a unique filename for recording upload
      NSData * fileData = [NSData dataWithContentsOfURL:fileURL];
      NSString * userName = nameTextField.text;
      NSString * uniqueAudioProfileTemp = [@"audioprofile_" stringByAppendingString: userName];
-     NSString * uniqueAudioProfile = [uniqueAudioProfileTemp stringByAppendingString:@".m4a"];
+     NSString * uniqueAudioProfile = [uniqueAudioProfileTemp stringByAppendingString:@".wav"];
      
-     [formData appendPartWithFileData:fileData name:@"soundfile" fileName:uniqueAudioProfile mimeType:@"audio/m4a"];
+     [formData appendPartWithFileData:fileData name:@"soundfile" fileName:uniqueAudioProfile mimeType:@"audio/wav"];
  }
                    success:^(AFHTTPRequestOperation * operation, id responseObject) {
                        [weakSelf refresh];
@@ -111,6 +155,16 @@ stk::StkFrames * readBuffer;
     stk::Stk::showWarnings( true );
     //! Toggle display of error messages before throwing exceptions.
     stk::Stk::printErrors( true );
+    
+    // start
+    bool result = MoAudio::start( audioCallback, NULL );
+    if( !result )
+    {
+  //       do not do this:
+        NSLog(@"Cannot start real-time audio!");
+ //          int * p = 0;
+   //        *p = 0;
+    }
     
     soundShareClient = [SoundShareClient sharedClient];
     
@@ -178,5 +232,49 @@ stk::StkFrames * readBuffer;
         NSLog(@"FAILURE, %@", error);
     }];
 }
+
+#pragma mark - UITableViewDataSource
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    int i = [indexPath indexAtPosition:1];  // The first index is the section, which will always be 0
+    
+    NSDictionary * soundJSON = [self.sounds objectAtIndex:i];
+    NSDictionary * soundFields = [soundJSON objectForKey:@"fields"];
+    NSString * soundPath = [soundFields objectForKey:@"path"];
+    NSURL * url = [NSURL URLWithString:[NSString stringWithFormat:@"%@soundshare/sounds/%@", kSoundShareBaseURLString, soundPath]];
+    NSLog(@"URL: %@", url);
+    [self playSoundAtURL:url];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [self.sounds count];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *soundCellIdentifier = @"Sound";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:soundCellIdentifier];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:soundCellIdentifier];
+    }
+    
+    int i = [indexPath indexAtPosition:1];  // The first index is the section, which will always be 0
+    
+    NSDictionary *soundJSON = [self.sounds objectAtIndex:i];
+    NSDictionary *soundFields = [soundJSON objectForKey:@"fields"];
+    cell.textLabel.text = [soundFields objectForKey:@"name"];
+    cell.detailTextLabel.text = [soundFields objectForKey:@"description"];
+    
+    return cell;
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return NO;
+}
+
 
 @end
