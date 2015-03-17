@@ -9,6 +9,7 @@
 #include "JCAudioCallback.h"
 #import "mo-audio.h"
 #import "mo-gfx.h"
+#import <iostream>
 
 // Screen Info
 static CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -33,9 +34,10 @@ static Float32 delayedBuffer[SRATE*DELAYTIME]; //temp buffer to record audio
 static bool g_listen = false; //when true, records audio
 static bool g_play = false; // when true, plays audio
 
+
 JCAudioCallback::JCAudioCallback() {
-    JCAudioCallback::j = 0;
-    JCAudioCallback::k = j + 1;
+    this->j = 0;
+    this->k = j + 1;
 
 };
 
@@ -49,6 +51,16 @@ int JCAudioCallback::getK()
     return JCAudioCallback::k;
 }
 
+void JCAudioCallback::setJ(int newInt)
+{
+    this->j = newInt;
+}
+
+void JCAudioCallback::setK(int newInt)
+{
+    this->k = newInt;
+}
+
 //-----------------------------------------------------------------------------
 // Name: audio_callback()
 // Desc: audio callback
@@ -57,6 +69,7 @@ int JCAudioCallback::getK()
 //static int k = j + 1; // k will "tick" ever second
 void JCAudioCallback::audioCallback( Float32 * buffer, UInt32 numFrames, void * userData )
 {
+    std::cout << j << std::endl;
     // our x
     SAMPLE x = 0;
     // increment
@@ -80,8 +93,8 @@ void JCAudioCallback::audioCallback( Float32 * buffer, UInt32 numFrames, void * 
             
             if(JCAudioCallback::j<(SRATE*DELAYTIME-1))
             {
-                JCAudioCallback::j++;
-                if (JCAudioCallback::j % SRATE == 0) JCAudioCallback::k++; // tick by "mod"ing every SRATE passing
+                setJ(JCAudioCallback::j+1);
+                if (JCAudioCallback::j % SRATE == 0) setK(JCAudioCallback::k+1); // tick by "mod"ing every SRATE passing
             }
             else
             {
@@ -97,8 +110,8 @@ void JCAudioCallback::audioCallback( Float32 * buffer, UInt32 numFrames, void * 
             
             if(JCAudioCallback::j<(SRATE*DELAYTIME-1))
             {
-                JCAudioCallback::j++;
-                if (JCAudioCallback::j % SRATE == 0) JCAudioCallback::k++;
+                setJ(JCAudioCallback::j+1);
+                if (JCAudioCallback::j % SRATE == 0) setK(JCAudioCallback::k+1);;
             }
             else
             {

@@ -47,7 +47,7 @@ static GLfloat g_gfxWidth = screenWidth;
 static GLfloat g_gfxHeight = screenHeight;
 
 // Audio Variables
-SAMPLE g_vertices[FRAMESIZE*2]; //used for drawing waveforms
+//SAMPLE g_vertices[FRAMESIZE*2]; //used for drawing waveforms
 static UInt32 g_numFrames;
 int delaySize = JCAudioFile::bufferSize();
 static Float32 delayedBuffer[SRATE*DELAYTIME]; //temp buffer to record audio
@@ -634,33 +634,33 @@ void initializeTextures()
 // Name: drawWaveforms()
 // Desc: Draws a time domain-amplitude graph in real time
 //-----------------------------------------------------------------------------
-void drawWaveforms()
-{
-    // push
-    glPushMatrix();
-    
-    // center it
-    // glTranslatef( -g_waveformWidth / 2, 0, 4 );
-    glTranslatef( 0, 0, 4 );
-    //   glScalef(0.2, 0.2, 0.2);
-    
-    // set the vertex array pointer
-    glVertexPointer( 2, GL_FLOAT, 0, g_vertices );
-    glEnableClientState( GL_VERTEX_ARRAY );
-    
-    // color
-    glColor4f( 1, 1, 0, 1 );
-    // draw the thing
-    glDrawArrays( GL_LINE_STRIP, 0, g_numFrames/2 );
-    
-    // color
-    glColor4f( 0, 1, 0, 1 );
-    // draw the thing
-    glDrawArrays( GL_LINE_STRIP, g_numFrames/2-1, g_numFrames/2 );
-    
-    // pop
-    glPopMatrix();
-}
+//void drawWaveforms()
+//{
+//    // push
+//    glPushMatrix();
+//    
+//    // center it
+//    // glTranslatef( -g_waveformWidth / 2, 0, 4 );
+//    glTranslatef( 0, 0, 4 );
+//    //   glScalef(0.2, 0.2, 0.2);
+//    
+//    // set the vertex array pointer
+//    glVertexPointer( 2, GL_FLOAT, 0, g_vertices );
+//    glEnableClientState( GL_VERTEX_ARRAY );
+//    
+//    // color
+//    glColor4f( 1, 1, 0, 1 );
+//    // draw the thing
+//    glDrawArrays( GL_LINE_STRIP, 0, g_numFrames/2 );
+//    
+//    // color
+//    glColor4f( 0, 1, 0, 1 );
+//    // draw the thing
+//    glDrawArrays( GL_LINE_STRIP, g_numFrames/2-1, g_numFrames/2 );
+//    
+//    // pop
+//    glPopMatrix();
+//}
 
 
 //-----------------------------------------------------------------------------

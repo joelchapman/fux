@@ -16,13 +16,15 @@ class JCAudioCallback
 {
 public:
     JCAudioCallback();
-    static void audioCallback( Float32 * buffer, UInt32 numFrames, void * userData );
+    void audioCallback( Float32 * buffer, UInt32 numFrames, void * userData );
     int getJ();
     int getK();
+    void setJ(int newInt);
+    void setK(int newInt);
     
 private:
-    static int j;
-    static int k;
+    int j;
+    int k;
 };
 
 #endif /* defined(__Fux__JCAudioCallback__) */

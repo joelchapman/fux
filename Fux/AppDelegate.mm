@@ -35,7 +35,7 @@
 //static bool g_next_encouragement = false;
 //static bool g_play = false; // when true, plays audio
 
-
+JCAudioCallback audCallback;
 
 @interface AppDelegate ()
 
@@ -76,7 +76,7 @@
         //    *p = 0;
     }
     // start
-    result = MoAudio::start( JCAudioCallback::audioCallback , NULL );
+    result = MoAudio::start( audCallback.audioCallback , NULL );
     if( !result )
     {
         // do not do this:
