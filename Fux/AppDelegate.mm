@@ -7,7 +7,35 @@
 //
 
 #import "AppDelegate.h"
-//#import "mo-audio.h"
+#import "mo-audio.h"
+#import "mo-gfx.h"
+#import "JCAudioCallback.h"
+
+//// Screen Info
+//static CGRect screenRect = [[UIScreen mainScreen] bounds];
+//static CGFloat screenWidth = screenRect.size.width;
+//static CGFloat screenHeight = screenRect.size.height;
+//
+// Audio Defines
+#define SRATE 44100
+#define FRAMESIZE 1024
+#define DELAYTIME 10
+#define NUM_CHANNELS 2
+//
+//// Audio Variables
+//SAMPLE g_vertices[FRAMESIZE*2]; //used for drawing waveforms
+//static UInt32 g_numFrames;
+//static GLfloat g_waveformWidth = 300;
+//static GLfloat g_gfxWidth = screenWidth;
+//static GLfloat g_gfxHeight = screenHeight;
+//static Float32 delayedBuffer[SRATE*DELAYTIME]; //temp buffer to record audio
+//
+//// Program globals
+//static bool g_listen = false; //when true, records audio
+//static bool g_next_encouragement = false;
+//static bool g_play = false; // when true, plays audio
+
+
 
 @interface AppDelegate ()
 
@@ -38,6 +66,23 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    
+    // init
+    bool result = MoAudio::init( SRATE, FRAMESIZE, NUM_CHANNELS );
+    if( !result )
+    {
+        // do not do this:
+        //    int * p = 0;
+        //    *p = 0;
+    }
+    // start
+    result = MoAudio::start( JCAudioCallback::audioCallback , NULL );
+    if( !result )
+    {
+        // do not do this:
+        //   int * p = 0;
+        //   *p = 0;
+    }
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

@@ -15,7 +15,7 @@
 		5D1FD8D21AA6853600CE0DCA /* thang.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D1FD8CB1AA6853600CE0DCA /* thang.png */; };
 		5D1FD8D31AA6853600CE0DCA /* the_one.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D1FD8CC1AA6853600CE0DCA /* the_one.png */; };
 		5D8712071A9A7B8C006E3E90 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D8712061A9A7B8C006E3E90 /* main.m */; };
-		5D87120A1A9A7B8C006E3E90 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D8712091A9A7B8C006E3E90 /* AppDelegate.m */; };
+		5D87120A1A9A7B8C006E3E90 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D8712091A9A7B8C006E3E90 /* AppDelegate.mm */; };
 		5D87120D1A9A7B8C006E3E90 /* Fux.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5D87120B1A9A7B8C006E3E90 /* Fux.xcdatamodeld */; };
 		5D8712131A9A7B8C006E3E90 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5D8712111A9A7B8C006E3E90 /* Main.storyboard */; };
 		5D8712151A9A7B8C006E3E90 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D8712141A9A7B8C006E3E90 /* Images.xcassets */; };
@@ -28,6 +28,7 @@
 		5D89425C1AB50ED400A12A40 /* da_upload.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D89425B1AB50ED400A12A40 /* da_upload.png */; };
 		5D89425E1AB646D000A12A40 /* upload.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D89425D1AB646D000A12A40 /* upload.png */; };
 		5D8942601AB79A6700A12A40 /* audioprofile.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5D89425F1AB79A6700A12A40 /* audioprofile.wav */; };
+		5D8942631AB7A2B700A12A40 /* JCAudioCallback.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D8942611AB7A2B700A12A40 /* JCAudioCallback.mm */; };
 		5DB43BEC1AA6FCEC008BC319 /* you_got_this.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DB43BEB1AA6FCEC008BC319 /* you_got_this.png */; };
 		5DB43BEE1AA6FD62008BC319 /* someone.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DB43BED1AA6FD62008BC319 /* someone.png */; };
 		5DB43BF01AA6FD6C008BC319 /* style.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DB43BEF1AA6FD6C008BC319 /* style.png */; };
@@ -131,7 +132,7 @@
 		5D8712051A9A7B8C006E3E90 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5D8712061A9A7B8C006E3E90 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		5D8712081A9A7B8C006E3E90 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		5D8712091A9A7B8C006E3E90 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		5D8712091A9A7B8C006E3E90 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		5D87120C1A9A7B8C006E3E90 /* Fux.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Fux.xcdatamodel; sourceTree = "<group>"; };
 		5D8712121A9A7B8C006E3E90 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		5D8712141A9A7B8C006E3E90 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -149,6 +150,8 @@
 		5D89425B1AB50ED400A12A40 /* da_upload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = da_upload.png; sourceTree = "<group>"; };
 		5D89425D1AB646D000A12A40 /* upload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upload.png; sourceTree = "<group>"; };
 		5D89425F1AB79A6700A12A40 /* audioprofile.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = audioprofile.wav; sourceTree = "<group>"; };
+		5D8942611AB7A2B700A12A40 /* JCAudioCallback.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = JCAudioCallback.mm; sourceTree = "<group>"; };
+		5D8942621AB7A2B700A12A40 /* JCAudioCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JCAudioCallback.h; sourceTree = "<group>"; };
 		5DB43BEB1AA6FCEC008BC319 /* you_got_this.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = you_got_this.png; path = "Supporting Files/Images/Encouragement/you_got_this.png"; sourceTree = "<group>"; };
 		5DB43BED1AA6FD62008BC319 /* someone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = someone.png; path = "Supporting Files/Images/Encouragement/someone.png"; sourceTree = "<group>"; };
 		5DB43BEF1AA6FD6C008BC319 /* style.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = style.png; path = "Supporting Files/Images/Encouragement/style.png"; sourceTree = "<group>"; };
@@ -339,7 +342,9 @@
 			isa = PBXGroup;
 			children = (
 				5D8712081A9A7B8C006E3E90 /* AppDelegate.h */,
-				5D8712091A9A7B8C006E3E90 /* AppDelegate.m */,
+				5D8712091A9A7B8C006E3E90 /* AppDelegate.mm */,
+				5D8942621AB7A2B700A12A40 /* JCAudioCallback.h */,
+				5D8942611AB7A2B700A12A40 /* JCAudioCallback.mm */,
 				5DD399081AA45794000ED696 /* JCAudioFile.h */,
 				5DD399631AA45925000ED696 /* JCAudioFile.mm */,
 				5DB43BF71AA7C2A0008BC319 /* JCCoordinates.h */,
@@ -771,13 +776,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				5DD399381AA4581E000ED696 /* mo-audio.mm in Sources */,
-				5D87120A1A9A7B8C006E3E90 /* AppDelegate.m in Sources */,
+				5D87120A1A9A7B8C006E3E90 /* AppDelegate.mm in Sources */,
 				5DF18C661AA9222D00A9BA8E /* UIButton+AFNetworking.m in Sources */,
 				5D87120D1A9A7B8C006E3E90 /* Fux.xcdatamodeld in Sources */,
 				5DF18C231AA920A400A9BA8E /* SoundShareClient.m in Sources */,
 				5DF18C601AA9222D00A9BA8E /* AFURLConnectionOperation.m in Sources */,
 				5DD399641AA45925000ED696 /* JCAudioFile.mm in Sources */,
 				5DF18C641AA9222D00A9BA8E /* UIActivityIndicatorView+AFNetworking.m in Sources */,
+				5D8942631AB7A2B700A12A40 /* JCAudioCallback.mm in Sources */,
 				5DF18DDE1AA9422900A9BA8E /* JCProfileViewController.mm in Sources */,
 				5DF18C651AA9222D00A9BA8E /* UIAlertView+AFNetworking.m in Sources */,
 				5DB43BF61AA7B3CC008BC319 /* GLEntity.mm in Sources */,

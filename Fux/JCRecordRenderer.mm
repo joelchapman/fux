@@ -16,6 +16,8 @@
 #import "GLEntity.h"
 #import "JCCoordinates.h"
 #import "JCAudioFile.h"
+#import "AppDelegate.h"
+#import "JCAudioCallback.h"
 
 #import <iostream>
 
@@ -67,6 +69,7 @@ GLEntity g_button;
 GLEntity g_encouragements[NUM_ENCOURAGEMENTS];
 JCCoordinates g_coords;
 JCAudioFile userRecording;
+JCAudioCallback audioCallback;
 
 NSURL * profileURL = [[NSBundle mainBundle] URLForResource:@"audioprofile" withExtension:@"wav"];
 NSString * fileString = [profileURL absoluteString];
@@ -98,69 +101,70 @@ const char * fpath = [ff UTF8String];
 @end
 
 
-//-----------------------------------------------------------------------------
-// Name: audio_callback()
-// Desc: audio callback
-//-----------------------------------------------------------------------------
-static int j = 0;
-static int k = j + 1; // k will "tick" ever second
-void audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
-{
-    // our x
-    SAMPLE x = 0;
-    // increment
-    SAMPLE inc = g_waveformWidth / numFrames;
-    memset( g_vertices, 0, sizeof(SAMPLE)*FRAMESIZE*2 );
-    
-    for( int i = 0; i < numFrames; i++ )
-    {
-        
-        // set to current x value
-        g_vertices[NUM_CHANNELS*i] = x;
-        // increment x
-        x += inc;
-        // set the y coordinate (with scaling)
-        g_vertices[NUM_CHANNELS*i+1] = buffer[NUM_CHANNELS*i] * 2 * g_gfxHeight;
-        
-        // when record button is pressed
-        if (g_listen)
-        {
-                delayedBuffer[j] = buffer[i*NUM_CHANNELS+1];
-                
-                if(j<(SRATE*DELAYTIME-1))
-                {
-                    j++;
-                    if (j % SRATE == 0) k++; // tick by "mod"ing every SRATE passing
-                }
-                else
-                {
-                    g_listen = false;
-                    
-                    j = 0;
-                    k = j + 1;
-                }
-        }
-        
-        // when play button is pressed
-        if (g_play) {
-            
-            if(j<(SRATE*DELAYTIME-1))
-            {
-                j++;
-                if (j % SRATE == 0) k++;
-            }
-            else
-            {
-                g_play = false;
-                j = 0;
-                k = j + 1;
-            }
-        }
-       buffer[i*NUM_CHANNELS] = buffer[i*NUM_CHANNELS+1] = delayedBuffer[j]; // play shit
-    }
-    // save the num frames
-    g_numFrames = numFrames;
-}
+
+////-----------------------------------------------------------------------------
+//// Name: audio_callback()
+//// Desc: audio callback
+////-----------------------------------------------------------------------------
+//static int j = 0;
+//static int k = j + 1; // k will "tick" ever second
+//void audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
+//{
+//    // our x
+//    SAMPLE x = 0;
+//    // increment
+//    SAMPLE inc = g_waveformWidth / numFrames;
+//    memset( g_vertices, 0, sizeof(SAMPLE)*FRAMESIZE*2 );
+//    
+//    for( int i = 0; i < numFrames; i++ )
+//    {
+//        
+//        // set to current x value
+//        g_vertices[NUM_CHANNELS*i] = x;
+//        // increment x
+//        x += inc;
+//        // set the y coordinate (with scaling)
+//        g_vertices[NUM_CHANNELS*i+1] = buffer[NUM_CHANNELS*i] * 2 * g_gfxHeight;
+//        
+//        // when record button is pressed
+//        if (g_listen)
+//        {
+//                delayedBuffer[j] = buffer[i*NUM_CHANNELS+1];
+//                
+//                if(j<(SRATE*DELAYTIME-1))
+//                {
+//                    j++;
+//                    if (j % SRATE == 0) k++; // tick by "mod"ing every SRATE passing
+//                }
+//                else
+//                {
+//                    g_listen = false;
+//                    
+//                    j = 0;
+//                    k = j + 1;
+//                }
+//        }
+//        
+//        // when play button is pressed
+//        if (g_play) {
+//            
+//            if(j<(SRATE*DELAYTIME-1))
+//            {
+//                j++;
+//                if (j % SRATE == 0) k++;
+//            }
+//            else
+//            {
+//                g_play = false;
+//                j = 0;
+//                k = j + 1;
+//            }
+//        }
+//       buffer[i*NUM_CHANNELS] = buffer[i*NUM_CHANNELS+1] = delayedBuffer[j]; // play shit
+//    }
+//    // save the num frames
+//    g_numFrames = numFrames;
+//}
 
 
 //-----------------------------------------------------------------------------
@@ -248,8 +252,8 @@ void loadTextures()
 {
     int switcheroo;
     
-    if (k < 10) switcheroo = j/SRATE + 1;
-    else if (k == 10) switcheroo = k;
+    if (tickVariables::k < 10) switcheroo = tickVariables::j/SRATE + 1;
+    else if (tickVariables::k == 10) switcheroo = tickVariables::k;
 
     // if recording...
     if (g_listen) {
@@ -719,23 +723,23 @@ void GLoilerInitAudio()
 {
     memset( delayedBuffer, 0, sizeof SRATE*DELAYTIME );
     
-    // init
-    bool result = MoAudio::init( SRATE, FRAMESIZE, NUM_CHANNELS );
-    if( !result )
-    {
-        // do not do this:
-    //    int * p = 0;
-    //    *p = 0;
-    }
-    
-    // start
-    result = MoAudio::start( audio_callback, NULL );
-    if( !result )
-    {
-        // do not do this:
-     //   int * p = 0;
-     //   *p = 0;
-    }
+//    // init
+//    bool result = MoAudio::init( SRATE, FRAMESIZE, NUM_CHANNELS );
+//    if( !result )
+//    {
+//        // do not do this:
+//    //    int * p = 0;
+//    //    *p = 0;
+//    }
+//    
+//    // start
+//    result = MoAudio::start( audio_callback , NULL );
+//    if( !result )
+//    {
+//        // do not do this:
+//     //   int * p = 0;
+//     //   *p = 0;
+//    }
 }
 
 //-----------------------------------------------------------------------------
