@@ -16,13 +16,11 @@ class JCAudioCallback
 {
 public:
     JCAudioCallback();
-    void audioCallback( Float32 * buffer, UInt32 numFrames, void * userData );
-};
-
-class tickVariables
-{
-public:
-    tickVariables();
+    static void audioCallback( Float32 * buffer, UInt32 numFrames, void * userData );
+    int getJ();
+    int getK();
+    
+private:
     static int j;
     static int k;
 };

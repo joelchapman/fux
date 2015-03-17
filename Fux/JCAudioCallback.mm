@@ -33,15 +33,21 @@ static Float32 delayedBuffer[SRATE*DELAYTIME]; //temp buffer to record audio
 static bool g_listen = false; //when true, records audio
 static bool g_play = false; // when true, plays audio
 
-JCAudioCallback::JCAudioCallback() {};
+JCAudioCallback::JCAudioCallback() {
+    JCAudioCallback::j = 0;
+    JCAudioCallback::k = j + 1;
 
-
-tickVariables::tickVariables()
-{
-    tickVariables::j = 0;
-    tickVariables::k = j + 1;
 };
 
+int JCAudioCallback::getJ()
+{
+    return JCAudioCallback::j;
+}
+
+int JCAudioCallback::getK()
+{
+    return JCAudioCallback::k;
+}
 
 //-----------------------------------------------------------------------------
 // Name: audio_callback()
@@ -70,38 +76,38 @@ void JCAudioCallback::audioCallback( Float32 * buffer, UInt32 numFrames, void * 
         // when record button is pressed
         if (g_listen)
         {
-            delayedBuffer[tickVariables::j] = buffer[i*NUM_CHANNELS+1];
+            delayedBuffer[JCAudioCallback::j] = buffer[i*NUM_CHANNELS+1];
             
-            if(tickVariables::j<(SRATE*DELAYTIME-1))
+            if(JCAudioCallback::j<(SRATE*DELAYTIME-1))
             {
-                tickVariables::j++;
-                if (tickVariables::j % SRATE == 0) tickVariables::k++; // tick by "mod"ing every SRATE passing
+                JCAudioCallback::j++;
+                if (JCAudioCallback::j % SRATE == 0) JCAudioCallback::k++; // tick by "mod"ing every SRATE passing
             }
             else
             {
                 g_listen = false;
                 
-                tickVariables::j = 0;
-                tickVariables::k = tickVariables::j + 1;
+                JCAudioCallback::j = 0;
+                JCAudioCallback::k = JCAudioCallback::j + 1;
             }
         }
         
         // when play button is pressed
         if (g_play) {
             
-            if(tickVariables::j<(SRATE*DELAYTIME-1))
+            if(JCAudioCallback::j<(SRATE*DELAYTIME-1))
             {
-                tickVariables::j++;
-                if (tickVariables::j % SRATE == 0) tickVariables::k++;
+                JCAudioCallback::j++;
+                if (JCAudioCallback::j % SRATE == 0) JCAudioCallback::k++;
             }
             else
             {
                 g_play = false;
-                tickVariables::j = 0;
-                tickVariables::k = tickVariables::j + 1;
+                JCAudioCallback::j = 0;
+                JCAudioCallback::k = JCAudioCallback::j + 1;
             }
         }
-        buffer[i*NUM_CHANNELS] = buffer[i*NUM_CHANNELS+1] = delayedBuffer[tickVariables::j]; // play shit
+        buffer[i*NUM_CHANNELS] = buffer[i*NUM_CHANNELS+1] = delayedBuffer[JCAudioCallback::j]; // play shit
     }
     // save the num frames
     g_numFrames = numFrames;

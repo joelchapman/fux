@@ -252,8 +252,8 @@ void loadTextures()
 {
     int switcheroo;
     
-    if (tickVariables::k < 10) switcheroo = tickVariables::j/SRATE + 1;
-    else if (tickVariables::k == 10) switcheroo = tickVariables::k;
+    if (audioCallback.getK() < 10) switcheroo = audioCallback.getJ()/SRATE + 1;
+    else if (audioCallback.getK() == 10) switcheroo = audioCallback.getK();
 
     // if recording...
     if (g_listen) {
