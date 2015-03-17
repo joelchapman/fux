@@ -18,10 +18,10 @@ class JCAudioFile
 public:
     JCAudioFile();
 
-    void setRecording ( float tempBuffer[], int TRACKS );
-    float * getRecording( float tempBuffer[], int TRACKS );
+    void setRecording ( Float32 tempBuffer[], int TRACKS );
+    float * getRecording( Float32 tempBuffer[], int TRACKS );
     static int bufferSize();
-    void writeBufferToAudioFile(float buffer[], const char * fName, int mChannels, bool compress_with_m4a);
+    void writeBufferToAudioFile(Float32 buffer[], const char * fName, int mChannels, bool compress_with_m4a);
     
 private:
     float * recording;

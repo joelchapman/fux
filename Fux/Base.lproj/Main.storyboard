@@ -186,15 +186,22 @@
                                     <action selector="play:" destination="eVI-v4-a52" eventType="touchUpInside" id="o2c-tS-gfc"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="k5T-go-Utu">
-                                <rect key="frame" x="231" y="420" width="72" height="44"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="24S-Kf-DVU">
+                                <rect key="frame" x="115" y="392" width="90" height="72"/>
+                                <state key="normal" title="Button" image="da_upload.png">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="save:" destination="eVI-v4-a52" eventType="touchUpInside" id="wJI-Kd-gld"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j2d-Zu-2wD">
+                                <rect key="frame" x="223" y="403" width="80" height="40"/>
                                 <state key="normal" title="Button" image="right.png">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="save:" destination="eVI-v4-a52" eventType="touchUpInside" id="l2P-uP-teR"/>
-                                    <action selector="setFirstName:" destination="0He-nP-OUt" eventType="touchUpInside" id="6Ed-0X-PFI"/>
-                                    <segue destination="0He-nP-OUt" kind="modal" modalTransitionStyle="partialCurl" id="jQm-BN-kgb"/>
+                                    <segue destination="0He-nP-OUt" kind="modal" id="rb6-OB-zQO"/>
                                 </connections>
                             </button>
                         </subviews>

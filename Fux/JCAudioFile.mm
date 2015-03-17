@@ -17,22 +17,24 @@ using namespace std;
 
 #define SRATE 44100
 #define DELAYTIME 10
+#define NUM_CHANNELS 2
+#define BITS_PER_CHANNEL 32
 
 JCAudioFile::JCAudioFile()
 {
-    recording = (float*)malloc(SRATE*DELAYTIME*sizeof(float));
+    recording = (float*)malloc(SRATE*DELAYTIME*NUM_CHANNELS*sizeof(Float32));
 }
 
-void JCAudioFile::setRecording( float tempBuffer[], int TRACKS )
+void JCAudioFile::setRecording( Float32 tempBuffer[], int TRACKS )
 {
-    memcpy(recording, tempBuffer, sizeof(float)*SRATE*DELAYTIME);
+    memcpy(recording, tempBuffer, sizeof(Float32)*SRATE*DELAYTIME*NUM_CHANNELS);
 }
 
-float * JCAudioFile::getRecording( float tempBuffer[], int TRACKS )
+float * JCAudioFile::getRecording( Float32 tempBuffer[], int TRACKS )
 {
-    static float r[SRATE*DELAYTIME];
+    static float r[SRATE*DELAYTIME*NUM_CHANNELS];
     for (int i = 0; i < SRATE*DELAYTIME; i++) {
-        r[i] = tempBuffer[i];
+        r[i*NUM_CHANNELS] = r[i*NUM_CHANNELS + 1] = tempBuffer[i*NUM_CHANNELS];
     }
     return r;
 }
@@ -44,7 +46,7 @@ int JCAudioFile::bufferSize()
 
 
 // void writeBufferToAudioFile adapted from writeNoiseToAudioFile, written by Adam Stark
-void JCAudioFile::writeBufferToAudioFile(float buffer[], const char * fName, int mChannels, bool compress_with_m4a)
+void JCAudioFile::writeBufferToAudioFile(Float32 buffer[], const char * fName, int mChannels, bool compress_with_m4a)
 {
     OSStatus err; // to record errors from ExtAudioFile API functions
     
@@ -123,8 +125,9 @@ void JCAudioFile::writeBufferToAudioFile(float buffer[], const char * fName, int
         fileType = kAudioFileWAVEType;
         
         // This function audiomatically generates the audio format according to certain arguments
-        FillOutASBDForLPCM(clientFormat,SRATE,mChannels,32,32,true,false,false);
+        FillOutASBDForLPCM(clientFormat,SRATE,mChannels,BITS_PER_CHANNEL,BITS_PER_CHANNEL,true,false,false);
     }
+
     
     
     
@@ -134,7 +137,7 @@ void JCAudioFile::writeBufferToAudioFile(float buffer[], const char * fName, int
     
     // the local format describes the format the samples we will give to the ExtAudioFile API
     AudioStreamBasicDescription localFormat;
-    FillOutASBDForLPCM (localFormat,SRATE,mChannels,32,32,true,false,false);
+    FillOutASBDForLPCM (localFormat,SRATE,mChannels,BITS_PER_CHANNEL,BITS_PER_CHANNEL,true,false,false);
     
     
     

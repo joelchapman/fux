@@ -27,14 +27,16 @@ stk::StkFrames * readBuffer;
 static int sampleIndex = 0;
 
 
-void audioCallback(Float32 * buff, UInt32 frameSize, void * userData);
+//void audioCallback(Float32 * buff, UInt32 frameSize, void * userData);
 void audioCallback(Float32 * buff, UInt32 frameSize, void * userData)
 {
+    //printf("%d\n",(int)frameSize);
     bool didRead = false;
     if (fileReader && sampleIndex < fileReader->fileSize())
     {
+     //   std::cout << sampleIndex << std::endl;
         fileReader->read(*readBuffer, sampleIndex);
-        sampleIndex += FRAMESIZE;
+        sampleIndex += FRAMESIZE/2; // why on earth did i have to do this. audio is all messed up 3/16 21:26
         didRead = true;
     }
     for (int i = 0; i < frameSize; i++)
@@ -42,7 +44,6 @@ void audioCallback(Float32 * buff, UInt32 frameSize, void * userData)
         if (readBuffer && didRead)
         {
             buff[i * NUMCHANNELS] = buff[i * NUMCHANNELS + 1] = (*readBuffer)[i * NUMCHANNELS];
-            buff[i * NUMCHANNELS + 1] = buff[i * NUMCHANNELS] = (*readBuffer)[i * NUMCHANNELS + 1];
         }
         else
         {
@@ -77,7 +78,7 @@ void audioCallback(Float32 * buff, UInt32 frameSize, void * userData)
     NSLog(@"Tried to write to path: %@", path);
     [data writeToFile:path atomically:NO];
     
-    readBuffer = new stk::StkFrames(FRAMESIZE, 2);
+    readBuffer = new stk::StkFrames(FRAMESIZE, NUMCHANNELS);
     fileReader = new stk::FileRead();
     fileReader->open([path UTF8String]);
     sampleIndex = 0;
@@ -160,10 +161,7 @@ void audioCallback(Float32 * buff, UInt32 frameSize, void * userData)
     bool result = MoAudio::start( audioCallback, NULL );
     if( !result )
     {
-  //       do not do this:
         NSLog(@"Cannot start real-time audio!");
- //          int * p = 0;
-   //        *p = 0;
     }
     
     soundShareClient = [SoundShareClient sharedClient];
