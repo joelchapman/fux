@@ -23,6 +23,7 @@ using namespace std;
 JCAudioFile::JCAudioFile()
 {
     recording = (float*)malloc(SRATE*DELAYTIME*NUM_CHANNELS*sizeof(Float32));
+    JCAudioFile::otherUserRecording = (float*)malloc(SRATE*DELAYTIME*NUM_CHANNELS*sizeof(Float32));
 }
 
 void JCAudioFile::setRecording( Float32 tempBuffer[], int TRACKS )
@@ -37,6 +38,21 @@ float * JCAudioFile::getRecording( Float32 tempBuffer[], int TRACKS )
         r[i*NUM_CHANNELS] = r[i*NUM_CHANNELS + 1] = tempBuffer[i*NUM_CHANNELS];
     }
     return r;
+}
+
+void JCAudioFile::setOtherUserRecording( Float32 tempBuffer[], int TRACKS )
+{
+    memcpy(otherUserRecording, tempBuffer, sizeof(Float32)*SRATE*DELAYTIME*NUM_CHANNELS);
+}
+
+float * JCAudioFile::getOtherUserRecording( )
+{
+    static float r[SRATE*DELAYTIME*NUM_CHANNELS];
+    for (int i = 0; i < SRATE*DELAYTIME; i++) {
+        r[i*NUM_CHANNELS] = r[i*NUM_CHANNELS + 1] = otherUserRecording[i*NUM_CHANNELS];
+    }
+    return r;
+//    return otherUserRecording;
 }
 
 int JCAudioFile::bufferSize()
@@ -79,11 +95,10 @@ void JCAudioFile::writeBufferToAudioFile(Float32 buffer[], const char * fName, i
     // create an array to hold our audio
     float audioFile[totalFramesInFile*mChannels];
     
-    // fill the array with random numbers (white noise)
     for (int i = 0; i < totalFramesInFile*mChannels; i++)
     {
+     //   cout << i << endl;
         audioFile[i] = buffer[i];
-        // (yes, I know this noise has a DC offset, bad)
     }
     
     // set the AudioBuffer to point to the array containing the noise

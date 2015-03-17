@@ -45,3 +45,28 @@ JCCoordinates::JCCoordinates()
 
 };
 
+//JCName::JCName()
+//{
+//    first_name = (NSString *)CFBridgingRelease(malloc(10*sizeof(NSString*)));
+//    last_name = (NSString *)CFBridgingRelease(malloc(10*sizeof(NSString*)));
+//}
+//
+//void JCName::setFirstName(NSString * first)
+//{
+//    first_name = first;
+//}
+//
+//void JCName::setLastName(NSString * last)
+//{
+//    last_name = last;
+//}
+//
+//NSString * JCName::getFirstName()
+//{
+//    return first_name;
+//}
+//
+//NSString * JCName::getLastName()
+//{
+//    return last_name;
+//}

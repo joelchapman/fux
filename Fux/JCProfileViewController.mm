@@ -7,10 +7,12 @@
 //
 
 #import "JCProfileViewController.h"
+#import "JCAudioFile.h"
 #import "SoundShareClient.h"
 //#import "JCRecordRenderer.h"
 #import "AFHTTPRequestOperation.h"
 #import <CoreLocation/CoreLocation.h>
+#import "JCCoordinates.h"
 
 #import "mo-audio.h"
 #import "FileRead.h"
@@ -21,20 +23,25 @@
 #define SRATE 44100
 #define FRAMESIZE 1024
 #define NUMCHANNELS 2
+#define DELAYTIME 10
 
 stk::FileRead * fileReader = NULL;
 stk::StkFrames * readBuffer;
 static int sampleIndex = 0;
 
+Float32 tempBuff[SRATE*DELAYTIME];
+
+JCAudioFile otherUserRecording;
+//JCName names;
+
 
 //void audioCallback(Float32 * buff, UInt32 frameSize, void * userData);
 void audioCallback(Float32 * buff, UInt32 frameSize, void * userData)
 {
-    //printf("%d\n",(int)frameSize);
     bool didRead = false;
+    memset( buff, 0, sizeof(SAMPLE)*FRAMESIZE*2 );
     if (fileReader && sampleIndex < fileReader->fileSize())
     {
-     //   std::cout << sampleIndex << std::endl;
         fileReader->read(*readBuffer, sampleIndex);
         sampleIndex += FRAMESIZE/2; // why on earth did i have to do this. audio is all messed up 3/16 21:26
         didRead = true;
@@ -44,12 +51,17 @@ void audioCallback(Float32 * buff, UInt32 frameSize, void * userData)
         if (readBuffer && didRead)
         {
             buff[i * NUMCHANNELS] = buff[i * NUMCHANNELS + 1] = (*readBuffer)[i * NUMCHANNELS];
+            tempBuff[i * NUMCHANNELS] = tempBuff[i * NUMCHANNELS + 1] = buff[i * NUMCHANNELS];
+            
         }
         else
         {
             buff[i * NUMCHANNELS] = buff[i * NUMCHANNELS + 1] = 0;
         }
+     //   std::cout << tempBuff[i] << std::endl;
     }
+
+    otherUserRecording.setOtherUserRecording(tempBuff, 1);
 }
 
 
@@ -79,31 +91,44 @@ void audioCallback(Float32 * buff, UInt32 frameSize, void * userData)
     [data writeToFile:path atomically:NO];
     
     readBuffer = new stk::StkFrames(FRAMESIZE, NUMCHANNELS);
-    fileReader = new stk::FileRead();
-    fileReader->open([path UTF8String]);
+    fileReader = new stk::FileRead([path UTF8String], false, NUMCHANNELS, 32, SRATE);
+    fileReader->open([path UTF8String], false, NUMCHANNELS, 32, SRATE);
     sampleIndex = 0;
 }
+
+-(IBAction) stopAudio:(id)sender
+{
+    MoAudio::stop();
+    NSLog(@"audioCallback has stopped");
+}
+
 
 
 -(IBAction) uploadSound:(id)sender
 {
     [nameTextField resignFirstResponder];
     [descriptionTextField resignFirstResponder];
-    
+
+    NSArray * profileArray = [NSArray array];
     // UPLOAD A FILE
     NSMutableDictionary * parameters = [NSMutableDictionary dictionary];
     
     [parameters setObject:nameTextField.text forKey:@"name"];
-    [parameters setObject:descriptionTextField.text forKey:@"description"];
+   // JCName::setFirstName(nameTextField.text);
     
+    [parameters setObject:descriptionTextField.text forKey:@"description"];
+   // JCName::setLastName(descriptionTextField.text);
+    
+    float likes = 0;
     
     CLLocation * location = [locationManager location];
     CLLocationCoordinate2D coordinate = location.coordinate;
     CLLocationDegrees latitude = coordinate.latitude;
     CLLocationDegrees longitude = coordinate.longitude;
     
+  //  [parameters setObject:[NSNumber numberWithInt:1] forKey:@"likes"];
     [parameters setObject:[NSNumber numberWithFloat:latitude] forKey:@"lat"];
-    [parameters setObject:[NSNumber numberWithFloat:longitude] forKey:@"long"];
+    [parameters setObject:[NSNumber numberWithFloat:likes] forKey:@"long"];
     [parameters setObject:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"udid"];
     
     __weak JCProfileViewController * weakSelf = self;
@@ -234,9 +259,10 @@ void audioCallback(Float32 * buff, UInt32 frameSize, void * userData)
 #pragma mark - UITableViewDataSource
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//-(IBAction) playOtherProfile:(id)sender
 {
     int i = [indexPath indexAtPosition:1];  // The first index is the section, which will always be 0
-    
+  //  int i = 5;
     NSDictionary * soundJSON = [self.sounds objectAtIndex:i];
     NSDictionary * soundFields = [soundJSON objectForKey:@"fields"];
     NSString * soundPath = [soundFields objectForKey:@"path"];

@@ -26,4 +26,19 @@ public:
     GLfloat * texCoords;
 };
 
+//class JCName
+//{
+//public:
+//    JCName();
+//    
+//    static void setFirstName(NSString * first);
+//    static void setLastName(NSString * first);
+//    static NSString * getFirstName();
+//    static NSString * getLastName();
+//    
+//private:
+//    static NSString * first_name;
+//    static NSString * last_name;
+//};
+
 #endif /* defined(__Fux__JCCoordinates__) */

@@ -6,10 +6,13 @@
 //  Copyright (c) 2015 Joel Chapman. All rights reserved.
 //
 
-#import "JCProfileViewController.h"
+#import <UIKit/UIKit.h>
+#import <GLKit/GLKit.h>
+#import <CoreMotion/CoreMotion.h>
 
-@interface JCBrowseViewController: JCProfileViewController
+@interface JCBrowseViewController: GLKViewController
 
--(IBAction) doSomething:(id)sender;
+@property (strong, nonatomic) IBOutlet UILabel *firstName;
+@property (strong, nonatomic) IBOutlet UILabel *lastName;
 
 @end

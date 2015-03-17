@@ -20,11 +20,16 @@ public:
 
     void setRecording ( Float32 tempBuffer[], int TRACKS );
     float * getRecording( Float32 tempBuffer[], int TRACKS );
+    
+    void setOtherUserRecording ( Float32 tempBuffer[], int TRACKS );
+    float * getOtherUserRecording( );
+    
     static int bufferSize();
     void writeBufferToAudioFile(Float32 buffer[], const char * fName, int mChannels, bool compress_with_m4a);
     
 private:
     float * recording;
+    float * otherUserRecording;
 };
 
 #endif

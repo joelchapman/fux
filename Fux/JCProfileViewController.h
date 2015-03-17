@@ -8,6 +8,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GLKit/GLKit.h>
+#import <CoreMotion/CoreMotion.h>
 
 @interface JCProfileViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 
@@ -17,6 +19,7 @@
 @property (strong, nonatomic) NSArray *sounds;
 
 -(IBAction) uploadSound:(id)sender;
+-(IBAction) stopAudio:(id)sender;
 
 @end
 

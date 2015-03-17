@@ -1,23 +1,24 @@
 //
-//  JCRecordRenderer.mm
+//  JCBrowseRenderer.mm
 //  Fux
 //
-//  Created by Joel Chapman on 2/26/15.
+//  Created by Joel Chapman on 3/16/15.
 //  Copyright (c) 2015 Joel Chapman. All rights reserved.
 //  Using boiler-plate code from "Gloiler" (including MOMU) by Ge Wang.
 //
 
+#import "JCBrowseRenderer.h"
+#import "JCCoordinates.h"
 #import "JCRecordRenderer.h"
+#import "JCAudioFile.h"
+#import "GLEntity.h"
 #import "mo-audio.h"
 #import "mo-gfx.h"
 #import "mo-fun.h"
 #import "mo-touch.h"
-#import "JCAudioFile.h"
-#import "GLEntity.h"
-#import "JCCoordinates.h"
-#import "JCAudioFile.h"
-#import "AppDelegate.h"
-#import "JCAudioCallback.h"
+#import "Stk.h"
+#import "FileRead.h"
+#import "SoundShareClient.h"
 
 #import <iostream>
 
@@ -29,12 +30,13 @@ using namespace std;
 #define DELAYTIME 10
 #define NUM_CHANNELS 2
 
+#define NUM_FLIERS 2
+#define NUM_FLIER_PNGS 10
+
 #define SOLO 1
 #define NUM_PROGRESS 1
 #define NUM_BUTTONS 1
-#define NUM_ENCOURAGEMENTS 1
-#define NUM_TITS 2
-#define NUM_ENCOURAGEMENT_PNGS 10
+
 #define Z_CLOSE 4.0
 
 // Screen Info
@@ -47,60 +49,92 @@ static GLfloat g_gfxWidth = screenWidth;
 static GLfloat g_gfxHeight = screenHeight;
 
 // Audio Variables
-SAMPLE g_vertices[FRAMESIZE*2]; //used for drawing waveforms
+SAMPLE g_browse_vertices[FRAMESIZE*2]; //used for drawing waveforms
 static UInt32 g_numFrames;
-int delaySize = JCAudioFile::bufferSize();
-static Float32 delayedBuffer[SRATE*DELAYTIME*NUM_CHANNELS]; //temp buffer to record audio
+static Float32 browse_otherUserBuffer[SRATE*DELAYTIME*NUM_CHANNELS]; //other user's buffer
+static Float32 temp_buffer[SRATE*DELAYTIME*NUM_CHANNELS];
 
 // Texture globals
-static GLuint g_texture[1];
-static int g_rand_texture;
+static GLuint g_browse_texture[1];
+static int g_browse_rand_texture;
 
 // Program globals
-static bool g_listen = false; //when true, records audio
-static bool g_next_encouragement = false;
-static bool g_play = false; // when true, plays audio
+static bool g_browse_listen = false; //when true, records audio
+static bool g_browse_next_flier = false;
+static bool g_browse_play = false; // when true, plays audio
+
+static bool g_browse_slowdown = false;
+static bool g_browse_speedup = false;
+static bool g_browse_crazy = false;
+int g_browse_frameFactor = 2;
+NSString * justTheName = @""; // extracted user name
 
 // Class instantiations
+JCCoordinates g_browse_coords;
+GLEntity g_browse_progress;
+GLEntity g_browse_entity;
+GLEntity g_browse_fliers[NUM_FLIERS];
+JCAudioFile otherUserAudio;
+//JCName names;
 
-GLEntity g_title;
-GLEntity g_title_back;
-GLEntity g_progress;
-GLEntity g_button;
-GLEntity g_encouragements[NUM_ENCOURAGEMENTS];
-JCCoordinates g_coords;
-JCAudioFile userRecording;
-//JCAudioCallback audioCallback;
 
-NSURL * profileURL = [[NSBundle mainBundle] URLForResource:@"audioprofile" withExtension:@"wav"];
-NSString * fileString = [profileURL absoluteString];
-NSString * ff = [fileString substringFromIndex:7];
-const char * fpath = [ff UTF8String];
+stk::FileRead * browse_fileReader = NULL;
+stk::StkFrames * browse_readBuffer;
+static int sampleIndex = 0;
+
+Float32 g_browse_t = 0.0;
+Float32 g_browse_f = 30;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 // OBJECTIVE C STUFF
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-@implementation flarg : NSObject
-
-+(void) record:(id)sender
-{
-    g_listen = true;
-}
+@implementation browse_play : NSObject
+@synthesize browse_sounds;
 
 +(void) play:(id)sender
 {
-    g_play = true;
+    g_browse_play = true;
 }
 
-+(void) save:(id)sender
++(void) slowDown:(id)sender
 {
-    userRecording.writeBufferToAudioFile(userRecording.getRecording(delayedBuffer, 1), fpath, 2, false);
+    g_browse_speedup = false;
+    g_browse_slowdown = true;
+}
+
++(void) speedUp:(id)sender
+{
+    g_browse_slowdown = false;
+    g_browse_speedup = true;
+}
+
++(void) doSomethingCrazy:(id)sender
+{
+    g_browse_crazy = true;
+    g_browse_f = MoFun::rand2f(30,800);
+}
+
++(void) normal:(id)sender
+{
+    g_browse_speedup = false;
+    g_browse_slowdown = false;
+    g_browse_crazy = false;
+    g_browse_frameFactor = 2;
+}
+
++(void) outputFirstName:(NSString*)first
+{
+    first = justTheName;
+}
+
++(void) outputLastName:(NSString *)last
+{
+    last = @"Cope";
 }
 
 @end
-
 
 
 //-----------------------------------------------------------------------------
@@ -109,47 +143,31 @@ const char * fpath = [ff UTF8String];
 //-----------------------------------------------------------------------------
 static int j = 0;
 static int k = j + 1; // k will "tick" ever second
-void audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
+void browse_audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
 {
-    //printf("%d\n",(int)numFrames);
-    //std::cout << numFrames << endl;
-    // our x
-    SAMPLE x = 0;
-    // increment
-    SAMPLE inc = g_waveformWidth / numFrames;
-    memset( g_vertices, 0, sizeof(SAMPLE)*FRAMESIZE*2 );
+    Float32 ringMod;
+    if (g_browse_speedup) {
+        g_browse_frameFactor = 1;
+    }
+    if (g_browse_slowdown) {
+        g_browse_frameFactor = 4;
+    }
+    if (g_browse_speedup == false && g_browse_slowdown == false) {
+        g_browse_frameFactor = 2;
+    }
     
-    for( int i = 0; i < numFrames; i++ )
+    bool didRead = false;
+    memset( buffer, 0, sizeof(SAMPLE)*FRAMESIZE*2 );
+    if (browse_fileReader && sampleIndex < browse_fileReader->fileSize())
     {
-        
-        // set to current x value
-        g_vertices[NUM_CHANNELS*i] = x;
-        // increment x
-        x += inc;
-        // set the y coordinate (with scaling)
-        g_vertices[NUM_CHANNELS*i+1] = buffer[NUM_CHANNELS*i] * 2 * g_gfxHeight;
-        
-        // when record button is pressed
-        if (g_listen)
-        {
-                delayedBuffer[j*NUM_CHANNELS] = delayedBuffer[j*NUM_CHANNELS + 1] = buffer[i*NUM_CHANNELS+1];
-                
-                if(j<(SRATE*DELAYTIME-1))
-                {
-                    j++;
-                    if (j % SRATE == 0) k++; // tick by "mod"ing every SRATE passing
-                }
-                else
-                {
-                    g_listen = false;
-                    
-                    j = 0;
-                    k = j + 1;
-                }
-        }
-        
+        browse_fileReader->read(*browse_readBuffer, sampleIndex);
+        sampleIndex += FRAMESIZE/g_browse_frameFactor; // why on earth did i have to do this. audio is all messed up 3/16 21:26
+        didRead = true;
+    }
+    for (int i = 0; i < numFrames; i++)
+    {
         // when play button is pressed
-        if (g_play) {
+        if (g_browse_play) {
             
             if(j<(SRATE*DELAYTIME-1))
             {
@@ -158,26 +176,53 @@ void audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
             }
             else
             {
-                g_play = false;
+                g_browse_play = false;
                 j = 0;
                 k = j + 1;
             }
         }
-       buffer[i*NUM_CHANNELS] = buffer[i*NUM_CHANNELS+1] = delayedBuffer[j*NUM_CHANNELS]; // play shit
+        // if crazy is pressed
+        if (g_browse_crazy) {
+            // generate sine wave for ring mod
+            ringMod = ::sin( TWO_PI * g_browse_f * g_browse_t / SRATE );
+            // advance time
+            g_browse_t += 1.0;
+        } else ringMod = 1;
+
+        if (browse_readBuffer && didRead)
+        {
+            buffer[i * NUM_CHANNELS] = buffer[i * NUM_CHANNELS + 1] = ringMod*(*browse_readBuffer)[i * NUM_CHANNELS];
+            
+        }
+        else
+        {
+            buffer[i * NUM_CHANNELS] = buffer[i * NUM_CHANNELS + 1] = 0;
+        }
     }
-    // save the num frames
-    g_numFrames = numFrames;
 }
 
 
-//-----------------------------------------------------------------------------
-// Name: isTouchingButton(CGPoint pt)
-// Desc: Decides whether or not touch is in radius of button activity
-//-----------------------------------------------------------------------------
-bool isTouchingButton(CGPoint pt)
+void browse_playSoundAtURL(NSURL * url)
 {
+    NSLog(@"URL: %@", url);
     
-    return true;
+    // extract user's name
+    NSString * usersName = [url absoluteString];
+    NSString * noDotWav = [usersName substringToIndex:[usersName length] - 4];
+    justTheName = [noDotWav substringFromIndex:54];
+  //  NSString * noDotWav = [justTheNameDotWav substringToIndex:[noDotWav length] - 4];
+    //justTheName = [justTheNameNoDotWav UTF8String];
+    
+    NSData * data = [NSData dataWithContentsOfURL:url];
+    NSArray * paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString * path = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"audioprofile.wav"];
+    NSLog(@"Tried to write to path: %@", path);
+    [data writeToFile:path atomically:NO];
+    
+    browse_readBuffer = new stk::StkFrames(FRAMESIZE, NUM_CHANNELS);
+    browse_fileReader = new stk::FileRead([path UTF8String], false, NUM_CHANNELS, 32, SRATE);
+    browse_fileReader->open([path UTF8String], false, NUM_CHANNELS, 32, SRATE);
+    sampleIndex = 0;
 }
 
 
@@ -185,7 +230,7 @@ bool isTouchingButton(CGPoint pt)
 // Name: touch_callback()
 // Desc: the touch call back
 //-----------------------------------------------------------------------------
-void touch_callback( NSSet * touches, UIView * view,
+void browse_touch_callback( NSSet * touches, UIView * view,
                      std::vector<MoTouchTrack> & tracks,
                      void * data)
 {
@@ -210,9 +255,10 @@ void touch_callback( NSSet * touches, UIView * view,
                 // begin
             case UITouchPhaseBegan:
             {
-//                if (pt.x == g_button.loc.z + 0.5) {
-//                    g_listen = true;
-//                }
+                g_browse_play = true;
+                NSString * soundPath = @"audio_profile_Stud.wav";
+                NSURL * url = [NSURL URLWithString:[NSString stringWithFormat:@"%@soundshare/sounds/%@", kSoundShareBaseURLString, soundPath]];
+                browse_playSoundAtURL(url);
                 
                 NSLog( @"touch began... %f %f", pt.x, pt.y );
                 break;
@@ -251,14 +297,14 @@ void touch_callback( NSSet * touches, UIView * view,
 // Name: loadTextures()
 // Desc: loads the right texture based on the ol' switcheroo
 //-----------------------------------------------------------------------------
-void loadProgressTextures()
+void browse_loadProgressTextures()
 {
     int switcheroo;
     if (k < 10) switcheroo = j/SRATE + 1;
     else if (k == 10) switcheroo = k;
-
+    
     // if recording...
-    if (g_listen) {
+    if (g_browse_listen) {
         switch (switcheroo) {
             case 0:
                 MoGfx::loadTexture(@"progress_10", @"png");
@@ -308,7 +354,7 @@ void loadProgressTextures()
                 MoGfx::loadTexture(@"progress_10", @"png");
                 break;
         }
-    } else if (g_play) {
+    } else if (g_browse_play) {
         switch (switcheroo) {
             case 0:
                 MoGfx::loadTexture(@"progress_10", @"png");
@@ -359,18 +405,17 @@ void loadProgressTextures()
                 break;
         }
     } else MoGfx::loadTexture(@"progress_10", @"png");
-
-
+    
+    
 }
-
 
 //-----------------------------------------------------------------------------
 // Name: loadEncouragements()
 // Desc: loads various encouragments when user records profile
 //-----------------------------------------------------------------------------
-void loadEncouragements()
+void browse_loadEncouragements()
 {
-    switch (g_rand_texture) {
+    switch (g_browse_rand_texture) {
         case 1:
             MoGfx::loadTexture(@"bangin", @"png");
             break;
@@ -422,7 +467,7 @@ void loadEncouragements()
 // name: draw()
 // desc: draws stuff to the screen (progress bar, record button)
 //-----------------------------------------------------------------------------
-void draw(GLEntity entity, int num)
+void browse_draw(GLEntity entity, int num)
 {
     // for each entity
     for( int i = 0; i < num; i++ )
@@ -439,15 +484,15 @@ void draw(GLEntity entity, int num)
         glColor4f(entity.col.x, entity.col.y, entity.col.z, val);
         
         // vertex
-        glVertexPointer( 2, GL_FLOAT, 0, g_coords.squareVertices );
+        glVertexPointer( 2, GL_FLOAT, 0, g_browse_coords.squareVertices );
         glEnableClientState(GL_VERTEX_ARRAY );
         
         // normal
-        glNormalPointer( GL_FLOAT, 0, g_coords.normals );
+        glNormalPointer( GL_FLOAT, 0, g_browse_coords.normals );
         glEnableClientState( GL_NORMAL_ARRAY );
         
         // texture coordinate
-        glTexCoordPointer( 2, GL_FLOAT, 0, g_coords.texCoords );
+        glTexCoordPointer( 2, GL_FLOAT, 0, g_browse_coords.texCoords );
         glEnableClientState( GL_TEXTURE_COORD_ARRAY );
         
         // triangle strip
@@ -462,50 +507,50 @@ void draw(GLEntity entity, int num)
 // Name: drawEncouragements()
 // Desc: specific to encouragements, which are in motion and randomly placed
 //-----------------------------------------------------------------------------
-void drawEncouragements()
+void browse_drawEncouragements()
 {
-    loadEncouragements();
+    browse_loadEncouragements();
     
     // for each entity
-    for( int i = 0; i < NUM_ENCOURAGEMENTS; i++ )
+    for( int i = 0; i < NUM_FLIERS; i++ )
     {
         glPushMatrix();
         
-        if (g_next_encouragement == true) {
-            g_rand_texture = MoFun::rand2f(1, NUM_ENCOURAGEMENT_PNGS);
-            g_encouragements[i].setRandomCoords();
+        if (g_browse_next_flier == true) {
+            g_browse_rand_texture = MoFun::rand2f(1, NUM_FLIER_PNGS);
+            g_browse_fliers[i].setRandomCoords();
         }
         
-        g_next_encouragement = false;
+        g_browse_next_flier = false;
         
         // translate
-        glTranslatef( g_encouragements[i].loc.x, g_encouragements[i].loc.y, g_encouragements[i].loc.z );
-        glScalef( g_encouragements[i].sca.x, g_encouragements[i].sca.y, g_encouragements[i].sca.z );
+        glTranslatef( g_browse_fliers[i].loc.x, g_browse_fliers[i].loc.y, g_browse_fliers[i].loc.z );
+        glScalef( g_browse_fliers[i].sca.x, g_browse_fliers[i].sca.y, g_browse_fliers[i].sca.z );
         
         //color
-        GLfloat val = 1 - fabs(g_encouragements[i].loc.z)/Z_CLOSE;
+        GLfloat val = 1 - fabs(g_browse_fliers[i].loc.z)/Z_CLOSE;
         float v = val;
-        glColor4f(g_encouragements[i].col.x*v, g_encouragements[i].col.y*v, g_encouragements[i].col.z*v, val);
+        glColor4f(g_browse_fliers[i].col.x*v, g_browse_fliers[i].col.y*v, g_browse_fliers[i].col.z*v, val);
         
-        g_encouragements[i].loc.z += 0.2;
-        g_encouragements[i].sca.x += 0.2;
-        g_encouragements[i].sca.y += 0.3;
+        g_browse_fliers[i].loc.z += 0.2;
+        g_browse_fliers[i].sca.x += 0.2;
+        g_browse_fliers[i].sca.y += 0.3;
         
-        if (g_encouragements[i].loc.z > Z_CLOSE) {
-            g_encouragements[i].setRandomCoords();
-            g_next_encouragement = true;
+        if (g_browse_fliers[i].loc.z > Z_CLOSE) {
+            g_browse_fliers[i].setRandomCoords();
+            g_browse_next_flier = true;
         }
         
         // vertex
-        glVertexPointer( 2, GL_FLOAT, 0, g_coords.squareVertices );
+        glVertexPointer( 2, GL_FLOAT, 0, g_browse_coords.squareVertices );
         glEnableClientState(GL_VERTEX_ARRAY );
         
         // normal
-        glNormalPointer( GL_FLOAT, 0, g_coords.normals );
+        glNormalPointer( GL_FLOAT, 0, g_browse_coords.normals );
         glEnableClientState( GL_NORMAL_ARRAY );
         
         // texture coordinate
-        glTexCoordPointer( 2, GL_FLOAT, 0, g_coords.texCoords );
+        glTexCoordPointer( 2, GL_FLOAT, 0, g_browse_coords.texCoords );
         glEnableClientState( GL_TEXTURE_COORD_ARRAY );
         
         // triangle strip
@@ -520,9 +565,9 @@ void drawEncouragements()
 // Name: drawButton()
 // Desc: record button
 //-----------------------------------------------------------------------------
-void drawButton()
+void browse_drawButton()
 {
-    MoGfx::loadTexture(@"record_button", @"png");
+  //  MoGfx::loadTexture(@"record_button", @"png");
   //  draw(g_button, NUM_BUTTONS);
 }
 
@@ -530,10 +575,10 @@ void drawButton()
 // Name: drawProgressBar()
 // Desc: progress bar
 //-----------------------------------------------------------------------------
-void drawProgressBar()
+void browse_drawProgressBar()
 {
-    loadProgressTextures();
-    draw(g_progress, NUM_PROGRESS);
+    browse_loadProgressTextures();
+    browse_draw(g_browse_progress, NUM_PROGRESS);
 }
 
 
@@ -541,14 +586,11 @@ void drawProgressBar()
 // Name: drawTitle()
 // Desc: title
 //-----------------------------------------------------------------------------
-void drawTitle()
+void browse_drawTitle()
 {
  //   MoGfx::loadTexture(@"title", @"png");
-  //  draw(g_title, SOLO);
-    
-//    MoGfx::loadTexture(@"blank", @"png");
-//    draw(g_title_back, SOLO);
-    
+//    draw(g_title, SOLO);
+
 }
 
 
@@ -556,65 +598,36 @@ void drawTitle()
 // Name: drawRecordScreen()
 // Desc: calls functions to draw everything you see on the record screen
 //-----------------------------------------------------------------------------
-void drawRecordScreen()
+void browse_drawRecordScreen()
 {
-    if (!g_play && !g_listen) {
-        drawTitle();
-    }
-    drawProgressBar();
-    drawButton();
-    if (g_listen) {
-        drawEncouragements();
+  //  browse_drawTitle();
+    browse_drawProgressBar();
+  //  browse_drawButton();
+    if (g_browse_play) {
+        browse_drawEncouragements();
     }
 }
 
-
-//-----------------------------------------------------------------------------
-// Name: initializeTitleBack()
-// Desc: Set coordinates of title background using class GLEntity
-//-----------------------------------------------------------------------------
-void initializeTitleBack()
-{
-    g_title_back.setTitleBackCoords();
-}
-
-//-----------------------------------------------------------------------------
-// Name: initializeTitle()
-// Desc: Set coordinates of title using class GLEntity
-//-----------------------------------------------------------------------------
-void initializeTitle()
-{
-    g_title.setTitleCoords();
-}
 
 //-----------------------------------------------------------------------------
 // Name: initializeProgress()
 // Desc: Set coordinates of progress bar using class GLEntity
 //-----------------------------------------------------------------------------
-void initializeProgress()
+void browse_initializeProgress()
 {
-    g_progress.setProgressCoords();
+    g_browse_progress.setProgressCoords();
 }
 
-
-//-----------------------------------------------------------------------------
-// Name: initializeButton()
-// Desc: Set coordinates of record button using class GLEntity
-//-----------------------------------------------------------------------------
-void initializeButton()
-{
-    g_button.setButtonCoords();
-}
 
 
 //-----------------------------------------------------------------------------
 // Name: initializeEncouragements()
 // Desc: Set random coordinates of encouragements using class GLEntity
 //-----------------------------------------------------------------------------
-void initializeEncouragements()
+void browse_initializeEncouragements()
 {
-    for (int i = 0; i < NUM_ENCOURAGEMENTS; i++) {
-        g_encouragements[i].setRandomCoords();
+    for (int i = 0; i < NUM_FLIERS; i++) {
+        g_browse_fliers[i].setRandomCoords();
     }
 }
 
@@ -623,54 +636,20 @@ void initializeEncouragements()
 // Name: initializeTextures()
 // Desc: Calls functions to initialize coordinates
 //-----------------------------------------------------------------------------
-void initializeTextures()
+void browse_initializeTextures()
 {
- //   initializeTitle();
-   // initializeTitleBack();
-    initializeProgress();
-    initializeButton();
-    initializeEncouragements();
+    browse_initializeProgress();
+ //   initializeButton();
+    browse_initializeEncouragements();
 }
 
-
-//-----------------------------------------------------------------------------
-// Name: drawWaveforms()
-// Desc: Draws a time domain-amplitude graph in real time
-//-----------------------------------------------------------------------------
-//void drawWaveforms()
-//{
-//    // push
-//    glPushMatrix();
-//    
-//    // center it
-//    // glTranslatef( -g_waveformWidth / 2, 0, 4 );
-//    glTranslatef( 0, 0, 4 );
-//    //   glScalef(0.2, 0.2, 0.2);
-//    
-//    // set the vertex array pointer
-//    glVertexPointer( 2, GL_FLOAT, 0, g_vertices );
-//    glEnableClientState( GL_VERTEX_ARRAY );
-//    
-//    // color
-//    glColor4f( 1, 1, 0, 1 );
-//    // draw the thing
-//    glDrawArrays( GL_LINE_STRIP, 0, g_numFrames/2 );
-//    
-//    // color
-//    glColor4f( 0, 1, 0, 1 );
-//    // draw the thing
-//    glDrawArrays( GL_LINE_STRIP, g_numFrames/2-1, g_numFrames/2 );
-//    
-//    // pop
-//    glPopMatrix();
-//}
 
 
 //-----------------------------------------------------------------------------
 // Name: GLoilerInitVisual()
 // Desc: GL stuff / MoGfx perspectives
 //-----------------------------------------------------------------------------
-void GLoilerInitVisual()
+void browse_GLoilerInitVisual()
 {
     // projection
     glMatrixMode( GL_PROJECTION );
@@ -699,16 +678,16 @@ void GLoilerInitVisual()
     //   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     
     // generate texture name
-    glGenTextures( 1, &g_texture[0] );
+    glGenTextures( 1, &g_browse_texture[0] );
     // bind the texture
-    glBindTexture( GL_TEXTURE_2D, g_texture[0] );
+    glBindTexture( GL_TEXTURE_2D, g_browse_texture[0] );
     // setting parameters
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     
     
     //init GLEntities
-    initializeTextures();
+    browse_initializeTextures();
 }
 
 
@@ -716,32 +695,26 @@ void GLoilerInitVisual()
 // Name: GLoilerInitTouch()
 // Desc: Add touch callback
 //-----------------------------------------------------------------------------
-void GLoilerInitTouch()
+void browse_GLoilerInitTouch()
 {
     // set touch callback
- //   MoTouch::addCallback( touch_callback, NULL );
+    MoTouch::addCallback( browse_touch_callback, NULL );
 }
 
-void GLoilerInitAudio()
+void browse_GLoilerInitAudio()
 {
-    memset( delayedBuffer, 0, sizeof SRATE*DELAYTIME );
+    memset( browse_otherUserBuffer, 0, sizeof SRATE*DELAYTIME );
     
-    // init
-    bool result = MoAudio::init( SRATE, FRAMESIZE, NUM_CHANNELS );
-    if( !result )
-    {
-        // do not do this:
-    //    int * p = 0;
-    //    *p = 0;
+    float r[SRATE*DELAYTIME*NUM_CHANNELS];
+    for (int i = 0; i < SRATE*DELAYTIME; i++) {
+    //    temp_buffer[i*NUM_CHANNELS] = temp_buffer[i*NUM_CHANNELS + 1] = *otherUserAudio.getOtherUserRecording();
     }
     
     // start
-    result = MoAudio::start( audio_callback , NULL );
+    bool result = MoAudio::start( browse_audio_callback , NULL );
     if( !result )
     {
-        // do not do this:
-     //   int * p = 0;
-     //   *p = 0;
+        NSLog(@"Unable to start real-time audio!");
     }
 }
 
@@ -756,13 +729,13 @@ void GLoilerInitAudio()
 // Name: JCRecordInit()
 // Desc: Initialize the engine (audio, gfx, interaction)
 //-----------------------------------------------------------------------------
-void JCRecordInit()
+void JCBrowseInit()
 {
     NSLog( @"init..." );
     
-    GLoilerInitVisual();
-    GLoilerInitTouch();
-    GLoilerInitAudio();
+    browse_GLoilerInitVisual();
+    browse_GLoilerInitTouch();
+    browse_GLoilerInitAudio();
 }
 
 
@@ -770,7 +743,7 @@ void JCRecordInit()
 // Name: JCRecordSetDims( float width, float height )
 // Desc: Set graphics dimensions
 //-----------------------------------------------------------------------------
-void JCRecordSetDims( float width, float height )
+void JCBrowseSetDims( float width, float height )
 {
     NSLog( @"set dims: %f %f", width, height );
 }
@@ -780,12 +753,12 @@ void JCRecordSetDims( float width, float height )
 // Name: JCRecordRender()
 // Desc: Draw next frame of graphics
 //-----------------------------------------------------------------------------
-void JCRecordRender()
+void JCBrowseRender()
 {
     // clear
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     
     //    drawWaveforms();
-    drawRecordScreen();
+    browse_drawRecordScreen();
 }
