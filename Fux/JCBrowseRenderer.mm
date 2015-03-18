@@ -31,7 +31,7 @@ using namespace std;
 #define NUM_CHANNELS 2
 
 #define NUM_FLIERS 2
-#define NUM_FLIER_PNGS 10
+#define NUM_FLIER_PNGS 7
 
 #define SOLO 1
 #define NUM_PROGRESS 1
@@ -67,7 +67,10 @@ static bool g_browse_slowdown = false;
 static bool g_browse_speedup = false;
 static bool g_browse_crazy = false;
 int g_browse_frameFactor = 2;
+int userIndex;
+
 NSString * justTheName = @""; // extracted user name
+NSArray * g_browse_users = [NSArray arrayWithObjects:@"audioprofile_Stud.wav", @"audioprofile_Italian.wav", @"audioprofile_Chad.wav", @"audioprofile_Barry.wav", @"audioprofile_Bobby.wav", @"audioprofile_Matthius.wav", @"audioprofile_Siamese.wav", @"audioprofile_Pip.wav", nil];
 
 // Class instantiations
 JCCoordinates g_browse_coords;
@@ -77,6 +80,7 @@ GLEntity g_browse_fliers[NUM_FLIERS];
 JCAudioFile otherUserAudio;
 //JCName names;
 
+void browse_playSoundAtURL(NSURL* url);
 
 stk::FileRead * browse_fileReader = NULL;
 stk::StkFrames * browse_readBuffer;
@@ -85,56 +89,16 @@ static int sampleIndex = 0;
 Float32 g_browse_t = 0.0;
 Float32 g_browse_f = 30;
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-// OBJECTIVE C STUFF
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-@implementation browse_play : NSObject
-@synthesize browse_sounds;
-
-+(void) play:(id)sender
+void playNewProfile()
 {
+    userIndex = MoFun::rand2f(0, g_browse_users.count);
+    cout << "User Index: " << userIndex << endl;
     g_browse_play = true;
+    NSString * soundPath = g_browse_users[userIndex];
+    cout << "gBrowse" << g_browse_users[userIndex] << endl;
+    NSURL * url = [NSURL URLWithString:[NSString stringWithFormat:@"%@soundshare/sounds/%@", kSoundShareBaseURLString, soundPath]];
+    browse_playSoundAtURL(url);
 }
-
-+(void) slowDown:(id)sender
-{
-    g_browse_speedup = false;
-    g_browse_slowdown = true;
-}
-
-+(void) speedUp:(id)sender
-{
-    g_browse_slowdown = false;
-    g_browse_speedup = true;
-}
-
-+(void) doSomethingCrazy:(id)sender
-{
-    g_browse_crazy = true;
-    g_browse_f = MoFun::rand2f(30,800);
-}
-
-+(void) normal:(id)sender
-{
-    g_browse_speedup = false;
-    g_browse_slowdown = false;
-    g_browse_crazy = false;
-    g_browse_frameFactor = 2;
-}
-
-+(void) outputFirstName:(NSString*)first
-{
-    first = justTheName;
-}
-
-+(void) outputLastName:(NSString *)last
-{
-    last = @"Cope";
-}
-
-@end
 
 
 //-----------------------------------------------------------------------------
@@ -145,6 +109,8 @@ static int j = 0;
 static int k = j + 1; // k will "tick" ever second
 void browse_audio_callback( Float32 * buffer, UInt32 numFrames, void * userData )
 {
+    
+  //  cout << g_browse_crazy << endl;
     Float32 ringMod;
     if (g_browse_speedup) {
         g_browse_frameFactor = 1;
@@ -227,6 +193,67 @@ void browse_playSoundAtURL(NSURL * url)
 
 
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// OBJECTIVE C STUFF
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+@implementation browse_play : NSObject
+@synthesize browse_sounds;
+
++(void) play:(id)sender
+{
+    g_browse_play = true;
+}
+
++(void) slowDown:(id)sender
+{
+    g_browse_speedup = false;
+    g_browse_slowdown = true;
+}
+
++(void) speedUp:(id)sender
+{
+    g_browse_slowdown = false;
+    g_browse_speedup = true;
+}
+
++(void) doSomethingCrazy:(id)sender
+{
+    g_browse_crazy = true;
+    g_browse_f = MoFun::rand2f(30,800);
+}
+
++(void) normal:(id)sender
+{
+    g_browse_speedup = false;
+    g_browse_slowdown = false;
+    g_browse_crazy = false;
+    g_browse_frameFactor = 2;
+}
+
++(void) outputFirstName:(NSString*)first
+{
+    first = justTheName;
+}
+
++(void) outputLastName:(NSString *)last
+{
+    last = @"Cope";
+}
+
++(void) like:(id)sender
+{
+    playNewProfile();
+}
+
++(void) dislike:(id)sender
+{
+    playNewProfile();
+}
+
+@end
+
+//-----------------------------------------------------------------------------
 // Name: touch_callback()
 // Desc: the touch call back
 //-----------------------------------------------------------------------------
@@ -255,11 +282,8 @@ void browse_touch_callback( NSSet * touches, UIView * view,
                 // begin
             case UITouchPhaseBegan:
             {
-                g_browse_play = true;
-                NSString * soundPath = @"audio_profile_Stud.wav";
-                NSURL * url = [NSURL URLWithString:[NSString stringWithFormat:@"%@soundshare/sounds/%@", kSoundShareBaseURLString, soundPath]];
-                browse_playSoundAtURL(url);
-                
+
+                playNewProfile();
                 NSLog( @"touch began... %f %f", pt.x, pt.y );
                 break;
             }
@@ -415,49 +439,41 @@ void browse_loadProgressTextures()
 //-----------------------------------------------------------------------------
 void browse_loadEncouragements()
 {
-    switch (g_browse_rand_texture) {
+    switch (userIndex) {
+        case 0:
+            MoGfx::loadTexture(@"stud", @"png");
+            break;
+            
         case 1:
-            MoGfx::loadTexture(@"bangin", @"png");
+            MoGfx::loadTexture(@"italian", @"png");
             break;
             
         case 2:
-            MoGfx::loadTexture(@"hawt", @"png");
+            MoGfx::loadTexture(@"chad", @"png");
             break;
             
         case 3:
-            MoGfx::loadTexture(@"sexier", @"png");
+            MoGfx::loadTexture(@"barry", @"png");
             break;
             
         case 4:
-            MoGfx::loadTexture(@"sexy", @"png");
+            MoGfx::loadTexture(@"bobby", @"png");
             break;
             
         case 5:
-            MoGfx::loadTexture(@"smagin", @"png");
+            MoGfx::loadTexture(@"matthius", @"png");
             break;
             
         case 6:
-            MoGfx::loadTexture(@"someone", @"png");
+            MoGfx::loadTexture(@"siamese", @"png");
             break;
             
         case 7:
-            MoGfx::loadTexture(@"style", @"png");
-            break;
-            
-        case 8:
-            MoGfx::loadTexture(@"thang", @"png");
-            break;
-
-        case 9:
-            MoGfx::loadTexture(@"the_one", @"png");
-            break;
-            
-        case 10:
-            MoGfx::loadTexture(@"you_got_this", @"png");
+            MoGfx::loadTexture(@"pip", @"png");
             break;
             
         default:
-            MoGfx::loadTexture(@"sexy", @"png");
+          //  MoGfx::loadTexture(@"sexy", @"png");
             break;
     }
 }

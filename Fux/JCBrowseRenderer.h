@@ -33,6 +33,8 @@ void JCBrowseRender();
 +(void) speedUp:(id)sender;
 +(void) doSomethingCrazy:(id)sender;
 +(void) normal:(id)sender;
++(void) like:(id)sender;
++(void) dislike:(id)sender;
 
 +(void) outputFirstName:(NSString *)first;
 +(void) outputLastName:(NSString *)last;

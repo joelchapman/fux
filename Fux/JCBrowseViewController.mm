@@ -131,14 +131,27 @@
     
 }
 
+-(IBAction) like:(id)sender
+{
+    [browse_play like:sender];
+    
+}
+
+-(IBAction) dislike:(id)sender
+{
+    [browse_play dislike:sender];
+    
+}
+
 -(void) outputFirstName:(NSString *) first
 {
-    [browse_play outputFirstName:first];
+    self.firstName.text = first;
 }
 
 -(void) outputLastName:(NSString *) last
 {
-    [browse_play outputLastName:last];
+    std::cout << "last name: " << last << std::endl;
+    self.lastName.text = last;
 }
 
 #pragma mark - GLKView and GLKViewController delegate methods
