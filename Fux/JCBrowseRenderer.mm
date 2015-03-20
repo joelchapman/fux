@@ -70,7 +70,7 @@ int g_browse_frameFactor = 2;
 int userIndex;
 
 NSString * justTheName = @""; // extracted user name
-NSArray * g_browse_users = [NSArray arrayWithObjects:@"audioprofile_Stud.wav", @"audioprofile_Italian.wav", @"audioprofile_Chad.wav", @"audioprofile_Barry.wav", @"audioprofile_Bobby.wav", @"audioprofile_Matthius.wav", @"audioprofile_Siamese.wav", @"audioprofile_Pip.wav", nil];
+NSMutableArray * g_browse_users = [NSMutableArray arrayWithObjects:@"audioprofile_Stud.wav", @"audioprofile_Italian.wav", @"audioprofile_Chad.wav", @"audioprofile_Barry.wav", @"audioprofile_Bobby.wav", @"audioprofile_Matthius.wav", @"audioprofile_Siamese.wav", @"audioprofile_Pip.wav", @"audioprofile_Aquarius.wav", @"audioprofile_Morfl.wav", @"audioprofile_Music", nil];
 
 // Class instantiations
 JCCoordinates g_browse_coords;
@@ -470,6 +470,18 @@ void browse_loadEncouragements()
             
         case 7:
             MoGfx::loadTexture(@"pip", @"png");
+            break;
+            
+        case 8:
+            MoGfx::loadTexture(@"aquarius", @"png");
+            break;
+            
+        case 9:
+            MoGfx::loadTexture(@"morfl", @"png");
+            break;
+            
+        case 10:
+            MoGfx::loadTexture(@"music256b", @"png");
             break;
             
         default:
